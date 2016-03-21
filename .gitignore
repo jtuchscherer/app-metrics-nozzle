@@ -23,3 +23,5 @@ _testmain.go
 *.prof
 
 app-usage-nozzle
+run.sh
+my.db
