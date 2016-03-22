@@ -26,7 +26,7 @@ func singleAppHandler(formatter *render.Render) http.HandlerFunc {
 		fmt.Printf("Retrieving app at key : %s\n", key)
 		stat, exists := usageevents.AppStats[key]
 		if exists {
-			formatter.JSON(w, http.StatusOK, stat)
+			formatter.JSON(w, http.StatusOK, usageevents.CalculateDetailedStat(stat))
 		} else {
 			formatter.JSON(w, http.StatusNotFound, "No such app")
 		}

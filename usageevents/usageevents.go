@@ -23,10 +23,16 @@ type Event struct {
 type ApplicationStat struct {
 	LastEventTime int64  `json:"last_event_time"`
 	LastEvent     Event  `json:"last_event"`
-	EventCount    uint64 `json:"event_count"`
+	EventCount    int64  `json:"event_count"`
 	AppName       string `json:"app_name"`
 	OrgName       string `json:"org_name"`
 	SpaceName     string `json:"space_name"`
+}
+
+type ApplicationDetail struct {
+	Stats                 ApplicationStat `json:"stats"`
+	RequestsPerSecond     float64         `json:"req_per_second"`
+	ElapsedSinceLastEvent int64           `json:"elapsed_since_last_event"`
 }
 
 var mutex sync.Mutex
@@ -34,8 +40,11 @@ var mutex sync.Mutex
 // AppStats is a map of app names to collected stats.
 var AppStats = make(map[string]ApplicationStat)
 
+var feedStarted int64
+
 // ProcessEvents churns through the firehose channel, processing incoming events.
 func ProcessEvents(in chan *events.Envelope) {
+	feedStarted = time.Now().UnixNano()
 	for msg := range in {
 		processEvent(msg)
 	}
@@ -52,7 +61,19 @@ func processEvent(msg *events.Envelope) {
 			updateAppStat(event)
 		}
 	}
-	fmt.Println("tick")
+	//fmt.Println("tick")
+}
+
+func CalculateDetailedStat(stat ApplicationStat) (detail ApplicationDetail) {
+	detail.Stats = stat
+	if len(stat.LastEvent.Type) > 0 {
+		eventElapsed := time.Now().UnixNano() - stat.LastEventTime
+		detail.ElapsedSinceLastEvent = eventElapsed / 1000000000
+		totalElapsed := time.Now().UnixNano() - feedStarted
+		elapsedSeconds := totalElapsed / 1000000000
+		detail.RequestsPerSecond = float64(stat.EventCount) / float64(elapsedSeconds)
+	}
+	return
 }
 
 // GetMapKeyFromAppData converts the combo of an app, space, and org into a hashmap key
