@@ -6,6 +6,14 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/CrowdSurge/banner",
+			"Rev": "8c0e79dc5ff70fb2919f0d662f44fd72ccdf9be2"
+		},
+		{
+			"ImportPath": "github.com/CrowdSurge/banner/fonts",
+			"Rev": "8c0e79dc5ff70fb2919f0d662f44fd72ccdf9be2"
+		},
+		{
 			"ImportPath": "github.com/Sirupsen/logrus",
 			"Comment": "v0.10.0",
 			"Rev": "4b6ea7319e214d98c938f12692336f7ca9348d6b"
