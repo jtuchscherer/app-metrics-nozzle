@@ -13,7 +13,6 @@ import (
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
 type Event struct {
-	//Fields         logrus.Fields `json:"fields"`
 	Msg            string `json:"message"`
 	Type           string `json:"event_type"`
 	Origin         string `json:"origin"`
@@ -28,14 +27,6 @@ type Event struct {
 	OrgID          string `json:"org_id"`
 	SpaceID        string `json:"space_id"`
 }
-
-/*
-"origin":          msg.GetOrigin(),
-"cf_app_id":       logMessage.GetAppId(),
-"timestamp":       logMessage.GetTimestamp(),
-"source_type":     logMessage.GetSourceType(),
-"message_type":    logMessage.GetMessageType().String(),
-"source_instance": logMessage.GetSourceInstance(),*/
 
 // ApplicationStat represents the observed metadata about an app, e.g. last router event time, etc.
 type ApplicationStat struct {
@@ -80,7 +71,6 @@ func processEvent(msg *events.Envelope) {
 			updateAppStat(event)
 		}
 	}
-	//fmt.Println("tick")
 }
 
 // CalculateDetailedStat takes application stats, uses the clock time, and calculates elapsed times and requests/second.
@@ -154,29 +144,29 @@ func (e *Event) AnnotateWithAppData() {
 	if appGUID != "<nil>" && cfAppID != "" {
 		appInfo := getAppInfo(appGUID)
 		cfAppName := appInfo.Name
-		cf_space_id := appInfo.SpaceGuid
-		cf_space_name := appInfo.SpaceName
-		cf_org_id := appInfo.OrgGuid
-		cf_org_name := appInfo.OrgName
+		cfSpaceID := appInfo.SpaceGuid
+		cfSpaceName := appInfo.SpaceName
+		cfOrgID := appInfo.OrgGuid
+		cfOrgName := appInfo.OrgName
 
 		if cfAppName != "" {
 			e.AppName = cfAppName
 		}
 
-		if cf_space_id != "" {
-			e.SpaceID = cf_space_id
+		if cfSpaceID != "" {
+			e.SpaceID = cfSpaceID
 		}
 
-		if cf_space_name != "" {
-			e.SpaceName = cf_space_name
+		if cfSpaceName != "" {
+			e.SpaceName = cfSpaceName
 		}
 
-		if cf_org_id != "" {
-			e.OrgID = cf_org_id
+		if cfOrgID != "" {
+			e.OrgID = cfOrgID
 		}
 
-		if cf_org_name != "" {
-			e.OrgName = cf_org_name
+		if cfOrgName != "" {
+			e.OrgName = cfOrgName
 		}
 	}
 }
