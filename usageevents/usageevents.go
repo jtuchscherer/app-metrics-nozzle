@@ -5,7 +5,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
-	"github.com/cloudfoundry-community/firehose-to-syslog/utils"
 
 	"sync"
 	"time"
@@ -53,9 +52,6 @@ func processEvent(msg *events.Envelope) {
 			updateAppStat(event)
 		}
 	}
-	if eventType == events.Envelope_CounterEvent {
-		event = CounterEvent(msg)
-	}
 	fmt.Println("tick")
 }
 
@@ -89,81 +85,6 @@ func getAppInfo(appGUID string) caching.App {
 	return caching.GetAppInfo(appGUID)
 }
 
-func HttpStart(msg *events.Envelope) Event {
-	httpStart := msg.GetHttpStart()
-
-	fields := logrus.Fields{
-		"origin":            msg.GetOrigin(),
-		"cf_app_id":         utils.FormatUUID(httpStart.GetApplicationId()),
-		"instance_id":       httpStart.GetInstanceId(),
-		"instance_index":    httpStart.GetInstanceIndex(),
-		"method":            httpStart.GetMethod(),
-		"parent_request_id": utils.FormatUUID(httpStart.GetParentRequestId()),
-		"peer_type":         httpStart.GetPeerType(),
-		"request_id":        utils.FormatUUID(httpStart.GetRequestId()),
-		"remote_addr":       httpStart.GetRemoteAddress(),
-		"timestamp":         httpStart.GetTimestamp(),
-		"uri":               httpStart.GetUri(),
-		"user_agent":        httpStart.GetUserAgent(),
-	}
-
-	return Event{
-		Fields: fields,
-		Msg:    "",
-		Type:   msg.GetEventType().String(),
-	}
-}
-
-func HttpStop(msg *events.Envelope) Event {
-	httpStop := msg.GetHttpStop()
-
-	fields := logrus.Fields{
-		"origin":         msg.GetOrigin(),
-		"cf_app_id":      utils.FormatUUID(httpStop.GetApplicationId()),
-		"content_length": httpStop.GetContentLength(),
-		"peer_type":      httpStop.GetPeerType(),
-		"request_id":     utils.FormatUUID(httpStop.GetRequestId()),
-		"status_code":    httpStop.GetStatusCode(),
-		"timestamp":      httpStop.GetTimestamp(),
-		"uri":            httpStop.GetUri(),
-	}
-
-	return Event{
-		Fields: fields,
-		Msg:    "",
-		Type:   msg.GetEventType().String(),
-	}
-}
-
-func HttpStartStop(msg *events.Envelope) Event {
-	httpStartStop := msg.GetHttpStartStop()
-
-	fields := logrus.Fields{
-		"origin":         msg.GetOrigin(),
-		"cf_app_id":      utils.FormatUUID(httpStartStop.GetApplicationId()),
-		"content_length": httpStartStop.GetContentLength(),
-		"instance_id":    httpStartStop.GetInstanceId(),
-		"instance_index": httpStartStop.GetInstanceIndex(),
-		"method":         httpStartStop.GetMethod(),
-		//	"parent_request_id": utils.FormatUUID(httpStartStop.GetParentRequestId()),
-		"peer_type":       httpStartStop.GetPeerType(),
-		"remote_addr":     httpStartStop.GetRemoteAddress(),
-		"request_id":      utils.FormatUUID(httpStartStop.GetRequestId()),
-		"start_timestamp": httpStartStop.GetStartTimestamp(),
-		"status_code":     httpStartStop.GetStatusCode(),
-		"stop_timestamp":  httpStartStop.GetStopTimestamp(),
-		"uri":             httpStartStop.GetUri(),
-		"user_agent":      httpStartStop.GetUserAgent(),
-		"duration_ms":     (((httpStartStop.GetStopTimestamp() - httpStartStop.GetStartTimestamp()) / 1000) / 1000),
-	}
-
-	return Event{
-		Fields: fields,
-		Msg:    "",
-		Type:   msg.GetEventType().String(),
-	}
-}
-
 func LogMessage(msg *events.Envelope) Event {
 	logMessage := msg.GetLogMessage()
 
@@ -179,75 +100,6 @@ func LogMessage(msg *events.Envelope) Event {
 	return Event{
 		Fields: fields,
 		Msg:    string(logMessage.GetMessage()),
-		Type:   msg.GetEventType().String(),
-	}
-}
-
-func ValueMetric(msg *events.Envelope) Event {
-	valMetric := msg.GetValueMetric()
-
-	fields := logrus.Fields{
-		"origin": msg.GetOrigin(),
-		"name":   valMetric.GetName(),
-		"unit":   valMetric.GetUnit(),
-		"value":  valMetric.GetValue(),
-	}
-
-	return Event{
-		Fields: fields,
-		Msg:    "",
-		Type:   msg.GetEventType().String(),
-	}
-}
-
-func CounterEvent(msg *events.Envelope) Event {
-	counterEvent := msg.GetCounterEvent()
-
-	fields := logrus.Fields{
-		"origin": msg.GetOrigin(),
-		"name":   counterEvent.GetName(),
-		"delta":  counterEvent.GetDelta(),
-		"total":  counterEvent.GetTotal(),
-	}
-
-	return Event{
-		Fields: fields,
-		Msg:    "",
-		Type:   msg.GetEventType().String(),
-	}
-}
-
-func ErrorEvent(msg *events.Envelope) Event {
-	errorEvent := msg.GetError()
-
-	fields := logrus.Fields{
-		"origin": msg.GetOrigin(),
-		"code":   errorEvent.GetCode(),
-		"delta":  errorEvent.GetSource(),
-	}
-
-	return Event{
-		Fields: fields,
-		Msg:    errorEvent.GetMessage(),
-		Type:   msg.GetEventType().String(),
-	}
-}
-
-func ContainerMetric(msg *events.Envelope) Event {
-	containerMetric := msg.GetContainerMetric()
-
-	fields := logrus.Fields{
-		"origin":         msg.GetOrigin(),
-		"cf_app_id":      containerMetric.GetApplicationId(),
-		"cpu_percentage": containerMetric.GetCpuPercentage(),
-		"disk_bytes":     containerMetric.GetDiskBytes(),
-		"instance_index": containerMetric.GetInstanceIndex(),
-		"memory_bytes":   containerMetric.GetMemoryBytes(),
-	}
-
-	return Event{
-		Fields: fields,
-		Msg:    "",
 		Type:   msg.GetEventType().String(),
 	}
 }
