@@ -3,7 +3,6 @@ package usageevents
 import (
 	"fmt"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 
 	"sync"
@@ -14,10 +13,29 @@ import (
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
 type Event struct {
-	Fields logrus.Fields `json:"fields"`
-	Msg    string        `json:"message"`
-	Type   string        `json:"event_type"`
+	//Fields         logrus.Fields `json:"fields"`
+	Msg            string `json:"message"`
+	Type           string `json:"event_type"`
+	Origin         string `json:"origin"`
+	AppID          string `json:"app_id"`
+	Timestamp      int64  `json:"timestamp"`
+	SourceType     string `json:"source_type"`
+	MessageType    string `json:"message_type"`
+	SourceInstance string `json:"source_instance"`
+	AppName        string `json:"app_name"`
+	OrgName        string `json:"org_name"`
+	SpaceName      string `json:"space_name"`
+	OrgID          string `json:"org_id"`
+	SpaceID        string `json:"space_id"`
 }
+
+/*
+"origin":          msg.GetOrigin(),
+"cf_app_id":       logMessage.GetAppId(),
+"timestamp":       logMessage.GetTimestamp(),
+"source_type":     logMessage.GetSourceType(),
+"message_type":    logMessage.GetMessageType().String(),
+"source_instance": logMessage.GetSourceInstance(),*/
 
 // ApplicationStat represents the observed metadata about an app, e.g. last router event time, etc.
 type ApplicationStat struct {
@@ -29,6 +47,7 @@ type ApplicationStat struct {
 	SpaceName     string `json:"space_name"`
 }
 
+// ApplicationDetail represents a time snapshot of the RPS and elapsed time since last event for an app
 type ApplicationDetail struct {
 	Stats                 ApplicationStat `json:"stats"`
 	RequestsPerSecond     float64         `json:"req_per_second"`
@@ -56,7 +75,7 @@ func processEvent(msg *events.Envelope) {
 	var event Event
 	if eventType == events.Envelope_LogMessage {
 		event = LogMessage(msg)
-		if event.Fields["source_type"] == "RTR" {
+		if event.SourceType == "RTR" {
 			event.AnnotateWithAppData()
 			updateAppStat(event)
 		}
@@ -64,6 +83,7 @@ func processEvent(msg *events.Envelope) {
 	//fmt.Println("tick")
 }
 
+// CalculateDetailedStat takes application stats, uses the clock time, and calculates elapsed times and requests/second.
 func CalculateDetailedStat(stat ApplicationStat) (detail ApplicationDetail) {
 	detail.Stats = stat
 	if len(stat.LastEvent.Type) > 0 {
@@ -82,9 +102,9 @@ func GetMapKeyFromAppData(orgName string, spaceName string, appName string) stri
 }
 
 func updateAppStat(logEvent Event) {
-	appName := logEvent.Fields["cf_app_name"].(string)
-	appOrg := logEvent.Fields["cf_org_name"].(string)
-	appSpace := logEvent.Fields["cf_space_name"].(string)
+	appName := logEvent.AppName
+	appOrg := logEvent.OrgName
+	appSpace := logEvent.SpaceName
 
 	appKey := GetMapKeyFromAppData(appOrg, appSpace, appName)
 	appStat := AppStats[appKey]
@@ -106,67 +126,57 @@ func getAppInfo(appGUID string) caching.App {
 	return caching.GetAppInfo(appGUID)
 }
 
+// LogMessage augments a raw message Envelope with log message metadata.
 func LogMessage(msg *events.Envelope) Event {
 	logMessage := msg.GetLogMessage()
 
-	fields := logrus.Fields{
-		"origin":          msg.GetOrigin(),
-		"cf_app_id":       logMessage.GetAppId(),
-		"timestamp":       logMessage.GetTimestamp(),
-		"source_type":     logMessage.GetSourceType(),
-		"message_type":    logMessage.GetMessageType().String(),
-		"source_instance": logMessage.GetSourceInstance(),
-	}
-
 	return Event{
-		Fields: fields,
-		Msg:    string(logMessage.GetMessage()),
-		Type:   msg.GetEventType().String(),
+		Origin:         msg.GetOrigin(),
+		AppID:          logMessage.GetAppId(),
+		Timestamp:      logMessage.GetTimestamp(),
+		SourceType:     logMessage.GetSourceType(),
+		SourceInstance: logMessage.GetSourceInstance(),
+		MessageType:    logMessage.GetMessageType().String(),
+		Msg:            string(logMessage.GetMessage()),
+		Type:           msg.GetEventType().String(),
 	}
 }
 
+// AnnotateWithAppData adds application specific details to an event by looking up the GUID in the cache.
 func (e *Event) AnnotateWithAppData() {
 
-	cf_app_id := e.Fields["cf_app_id"]
-	appGuid := ""
-	if cf_app_id != nil {
-		appGuid = fmt.Sprintf("%s", cf_app_id)
+	cfAppID := e.AppID
+	appGUID := ""
+	if cfAppID != "" {
+		appGUID = fmt.Sprintf("%s", cfAppID)
 	}
 
-	if cf_app_id != nil && appGuid != "<nil>" && cf_app_id != "" {
-		appInfo := getAppInfo(appGuid)
-		cf_app_name := appInfo.Name
+	if appGUID != "<nil>" && cfAppID != "" {
+		appInfo := getAppInfo(appGUID)
+		cfAppName := appInfo.Name
 		cf_space_id := appInfo.SpaceGuid
 		cf_space_name := appInfo.SpaceName
 		cf_org_id := appInfo.OrgGuid
 		cf_org_name := appInfo.OrgName
 
-		if cf_app_name != "" {
-			e.Fields["cf_app_name"] = cf_app_name
+		if cfAppName != "" {
+			e.AppName = cfAppName
 		}
 
 		if cf_space_id != "" {
-			e.Fields["cf_space_id"] = cf_space_id
+			e.SpaceID = cf_space_id
 		}
 
 		if cf_space_name != "" {
-			e.Fields["cf_space_name"] = cf_space_name
+			e.SpaceName = cf_space_name
 		}
 
 		if cf_org_id != "" {
-			e.Fields["cf_org_id"] = cf_org_id
+			e.OrgID = cf_org_id
 		}
 
 		if cf_org_name != "" {
-			e.Fields["cf_org_name"] = cf_org_name
+			e.OrgName = cf_org_name
 		}
-	}
-}
-
-func (e *Event) AnnotateWithMetaData(extraFields map[string]string) {
-	e.Fields["cf_origin"] = "firehose"
-	e.Fields["event_type"] = e.Type
-	for k, v := range extraFields {
-		e.Fields[k] = v
 	}
 }
