@@ -1,0 +1,8 @@
+applications:
+- path: .
+  memory: 1024MB
+  instances: 1
+  name: app-usage-nozzle
+  disk_quota: 1024M
+  command: app-usage-nozzle
+  buildpack: https://github.com/cloudfoundry/go-buildpack.git

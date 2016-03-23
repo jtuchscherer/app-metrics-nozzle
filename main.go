@@ -1,3 +1,19 @@
+/*
+Copyright 2016 Pivotal
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package main
 
 import (
@@ -50,7 +66,9 @@ func main() {
 	kingpin.Version(version)
 	kingpin.Parse()
 
-	log.Println(fmt.Sprintf("Starting app-usage-nozzle %s ", version))
+	logger := log.New(os.Stdout, "", 0)
+
+	logger.Println(fmt.Sprintf("Starting app-usage-nozzle %s ", version))
 
 	c := cfclient.Config{
 		ApiAddress:        *apiEndpoint,
@@ -63,12 +81,12 @@ func main() {
 	if len(*dopplerEndpoint) > 0 {
 		cfClient.Endpoint.DopplerEndpoint = *dopplerEndpoint
 	}
-	log.Println(fmt.Sprintf("Using %s as doppler endpoint", cfClient.Endpoint.DopplerEndpoint))
+	logger.Println(fmt.Sprintf("Using %s as doppler endpoint", cfClient.Endpoint.DopplerEndpoint))
 
 	//Use bolt for in-memory  - file caching
 	db, err := bolt.Open(*boltDatabasePath, 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
-		log.Fatal("Error opening bolt db: ", err)
+		logger.Fatal("Error opening bolt db: ", err)
 		os.Exit(1)
 
 	}
@@ -79,7 +97,7 @@ func main() {
 	caching.CreateBucket()
 
 	//Let's Update the database the first time
-	log.Println("Start filling app/space/org cache.")
+	logger.Println("Start filling app/space/org cache.")
 	apps := caching.GetAllApp()
 	for idx := range apps {
 		org := apps[idx].OrgName
@@ -89,23 +107,23 @@ func main() {
 		usageevents.AppStats[key] = usageevents.ApplicationStat{AppName: app, SpaceName: space, OrgName: org}
 	}
 
-	log.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))
+	logger.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))
 
 	// Ticker Pooling the CC every X sec
 	ccPolling := time.NewTicker(*tickerTime)
 
 	go func() {
 		for range ccPolling.C {
-			log.Println("Re-loading application cache.")
+			logger.Println("Re-loading application cache.")
 			apps = caching.GetAllApp()
 		}
 	}()
 
 	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, cfClient.GetToken(), *subscriptionID, *skipSSLValidation)
 	if firehose != nil {
-		log.Println("Firehose Subscription Succesfull! Routing events...")
+		logger.Println("Firehose Subscription Succesfull! Routing events...")
 		usageevents.ProcessEvents(firehose)
 	} else {
-		log.Fatal("Failed connecting to Firehose...Please check settings and try again!")
+		logger.Fatal("Failed connecting to Firehose...Please check settings and try again!")
 	}
 }
