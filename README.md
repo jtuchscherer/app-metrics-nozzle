@@ -41,7 +41,7 @@ This is a sample of what the JSON response looks like for `/api/apps`:
 
 If the `last_event_time` field is `0` that indicates that no _router_ events for that application have been discovered _since the nozzle was started_.
 
-The following is an example of application detail information, which includes computed metrics such as throughput (**requests_per_second**) and elapsed time since last event, which can be used to determine the degree of application idleness.
+The following is an example of application detail information, which includes computed metrics such as throughput (**req_per_second**) and elapsed time since last event, which can be used to determine the degree of application idleness.
 
 ```javascript
 {
