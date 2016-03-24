@@ -109,7 +109,7 @@ func main() {
 
 	logger.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))
 
-	// Ticker Pooling the CC every X sec
+	// Ticker Polling the CC every X sec
 	ccPolling := time.NewTicker(*tickerTime)
 
 	go func() {
