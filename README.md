@@ -71,3 +71,23 @@ The following is an example of application detail information, which includes co
   "elapsed_since_last_event": 21
 }
 ```
+
+## Installation
+To install this application, it should be run as an app within Cloud Foundry. So, the first thing you'll need to do is push the app. There is a `manifest.yml` already included in the project, so you can just do:
+
+```
+cf push app-usage-nozzle --no-start
+```
+
+The `no-start` is important because we have not yet defined the environment variables that allow the application to connect to the Firehose and begin monitoring router requests. We want to end up with a set of environment variables that looks like this when we issue a `cf env app-usage-nozzle` command:
+
+```
+User-Provided:
+API_ENDPOINT: https://api.run.pez.pivotal.io
+CF_PULL_TIME: 9999s
+FIREHOSE_PASSWORD: (this is a secret)
+FIREHOSE_SUBSCRIPTION_ID: app-usage-nozzle
+FIREHOSE_USER: (this is also secret)
+SKIP_SSL_VALIDATION: true
+```
+Once you've set these environment variables with `cf set-env (app) (var) (value)` you can just start the application usage nozzle via `cf start`. Make sure the application has come up by hitting the API endpoint. Depending on how large of a foundation in which it was deployed, it can take _several minutes_ for the cache of application metadata to fill up.
