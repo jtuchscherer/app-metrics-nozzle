@@ -46,12 +46,13 @@ type Event struct {
 
 // ApplicationStat represents the observed metadata about an app, e.g. last router event time, etc.
 type ApplicationStat struct {
-	LastEventTime int64  `json:"last_event_time"`
-	LastEvent     Event  `json:"last_event"`
-	EventCount    int64  `json:"event_count"`
-	AppName       string `json:"app_name"`
-	OrgName       string `json:"org_name"`
-	SpaceName     string `json:"space_name"`
+	LastEventTime int64   `json:"last_event_time"`
+	LastEvent     Event   `json:"last_event"`
+	EventCount    int64   `json:"event_count"`
+	AppName       string  `json:"app_name"`
+	OrgName       string  `json:"org_name"`
+	SpaceName     string  `json:"space_name"`
+	LastEventRPS  float64 `json:"last_event_rps"`
 }
 
 // ApplicationDetail represents a time snapshot of the RPS and elapsed time since last event for an app
@@ -120,6 +121,9 @@ func updateAppStat(logEvent Event) {
 	appStat.SpaceName = appSpace
 	appStat.OrgName = appOrg
 	appStat.LastEvent = logEvent
+
+	detail := CalculateDetailedStat(appStat)
+	appStat.LastEventRPS = detail.RequestsPerSecond
 	AppStats[appKey] = appStat
 }
 
