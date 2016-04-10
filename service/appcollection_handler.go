@@ -27,12 +27,16 @@ import (
 
 func appCollectionHandler(formatter *render.Render) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+		w.Header().Add("Access-Control-Allow-Methods", "GET")
 		formatter.JSON(w, http.StatusOK, usageevents.AppStats)
 	}
 }
 
 func singleAppHandler(formatter *render.Render) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+		w.Header().Add("Access-Control-Allow-Methods", "GET")
 		vars := mux.Vars(req)
 		app := vars["app"]
 		org := vars["org"]
