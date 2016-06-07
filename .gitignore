@@ -21,7 +21,8 @@ _testmain.go
 *.exe
 *.test
 *.prof
-
+.idea
+app-usage-nozzle.iml
 app-usage-nozzle
 run.sh
 my.db

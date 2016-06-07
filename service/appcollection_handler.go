@@ -21,9 +21,18 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/pivotalservices/app-usage-nozzle/usageevents"
+	"app-usage-nozzle/usageevents"
 	"github.com/unrolled/render"
 )
+
+//New deep structure with all application details
+func appHandler(formatter *render.Render) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+		w.Header().Add("Access-Control-Allow-Methods", "GET")
+		formatter.JSON(w, http.StatusOK, usageevents.AppDetails)
+	}
+}
 
 func appCollectionHandler(formatter *render.Render) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {

@@ -1,5 +1,5 @@
-hash: 07dc1097b00a61476349441a3bc9ff5c5fdbabcaab5ecb75caa1ea1e769c48f2
-updated: 2016-06-07T16:39:42.985593668-04:00
+hash: 2c636248e31a3f67897bdf71e67bafe25140641697b7d14e09e65c0521dca58b
+updated: 2016-06-07T17:13:37.241660411-04:00
 imports:
 - name: github.com/alecthomas/template
   version: 14fd436dd20c3cc65242a9f396b61bfc8a3926fc
@@ -22,7 +22,7 @@ imports:
   subpackages:
   - errors
 - name: github.com/cloudfoundry/sonde-go
-  version: ""
+  version: d6ed492b509e180ee7675ed15237906041e53a6e
   subpackages:
   - events
 - name: github.com/codegangsta/negroni
@@ -31,6 +31,10 @@ imports:
   version: 8c0e79dc5ff70fb2919f0d662f44fd72ccdf9be2
   subpackages:
   - fonts
+- name: github.com/davecgh/go-spew
+  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  subpackages:
+  - spew
 - name: github.com/gogo/protobuf
   version: d5d4941acc4490628827091cafee2168f8c4bc67
   subpackages:
