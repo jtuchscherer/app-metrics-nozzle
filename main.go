@@ -29,8 +29,8 @@ import (
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/cloudfoundry-community/firehose-to-syslog/firehose"
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/pivotalservices/app-usage-nozzle/service"
-	"github.com/pivotalservices/app-usage-nozzle/usageevents"
+	"app-usage-nozzle/service"
+	"app-usage-nozzle/usageevents"
 )
 
 var (

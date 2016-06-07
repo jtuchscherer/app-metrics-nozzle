@@ -18,13 +18,14 @@ package usageevents
 
 import (
 	"fmt"
-
+	"log"
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
-
 	"sync"
 	"time"
-
 	"github.com/cloudfoundry/sonde-go/events"
+	"github.com/cloudfoundry-community/go-cfclient"
+	"os"
+	"github.com/davecgh/go-spew/spew"
 )
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
@@ -67,6 +68,8 @@ var mutex sync.Mutex
 // AppStats is a map of app names to collected stats.
 var AppStats = make(map[string]ApplicationStat)
 
+var AppDetails = make(map[string]App)
+
 var feedStarted int64
 
 // ProcessEvents churns through the firehose channel, processing incoming events.
@@ -77,6 +80,24 @@ func ProcessEvents(in chan *events.Envelope) {
 	}
 }
 
+func LoadCcData()  {
+	logger := log.New(os.Stdout, "", 0)
+	logger.Println("Re-loading application cache.")
+
+	c := cfclient.Config{
+		ApiAddress:        "https://api.run.haas-41.pez.pivotal.io",
+		Username:          "admin",
+		Password:          "***REMOVED***",
+		SkipSslValidation: true,
+	}
+	client := cfclient.NewClient(&c)
+	apps := client.ListApps()
+
+	spew.Dump(apps)
+
+}
+
+
 func processEvent(msg *events.Envelope) {
 	eventType := msg.GetEventType()
 
@@ -86,6 +107,7 @@ func processEvent(msg *events.Envelope) {
 		if event.SourceType == "RTR" {
 			event.AnnotateWithAppData()
 			updateAppStat(event)
+			updateAppDetails(event)
 		}
 	}
 }
@@ -106,6 +128,27 @@ func CalculateDetailedStat(stat ApplicationStat) (detail ApplicationDetail) {
 // GetMapKeyFromAppData converts the combo of an app, space, and org into a hashmap key
 func GetMapKeyFromAppData(orgName string, spaceName string, appName string) string {
 	return fmt.Sprintf("%s/%s/%s", orgName, spaceName, appName)
+}
+
+func updateAppDetails(logEvent Event)  {
+	appName := logEvent.AppName
+	appOrg := logEvent.OrgName
+	appSpace := logEvent.SpaceName
+
+	appKey := GetMapKeyFromAppData(appOrg, appSpace, appName)
+	appDetail := AppDetails[appKey]
+	appDetail.Organization.Name = appOrg
+	appDetail.Organization.ID = logEvent.OrgID
+	appDetail.Space.Name = appSpace
+	appDetail.Space.ID = logEvent.SpaceID
+	appDetail.Name = appName
+	appDetail.GUID = logEvent.AppID
+	appDetail.EventCount++
+	appDetail.LastEvent.Message = logEvent.Msg
+	appDetail.LastEvent.Timestamp = logEvent.Timestamp
+
+	AppDetails[appKey] = appDetail
+
 }
 
 func updateAppStat(logEvent Event) {
@@ -150,6 +193,14 @@ func LogMessage(msg *events.Envelope) Event {
 		Msg:            string(logMessage.GetMessage()),
 		Type:           msg.GetEventType().String(),
 	}
+}
+
+func Reverse(s string) string {
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r)
 }
 
 // AnnotateWithAppData adds application specific details to an event by looking up the GUID in the cache.
