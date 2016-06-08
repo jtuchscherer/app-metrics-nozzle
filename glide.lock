@@ -15,8 +15,6 @@ imports:
   - caching
   - firehose
   - logging
-- name: github.com/cloudfoundry-community/go-cfclient
-  version: fa5067413ddd430b4c19f08a11bc93415ebb1672
 - name: github.com/cloudfoundry/noaa
   version: 87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f
   subpackages:

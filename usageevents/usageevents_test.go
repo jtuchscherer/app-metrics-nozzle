@@ -5,28 +5,22 @@ import (
 	//"github.com/pivotalservices/_app-usage-nozzle/usageevents"
 	 "fmt"
 	//"encoding/json"
-	"time"
+	//"time"
+	"github.com/davecgh/go-spew/spew"
 )
 
 
 
 func TestReverse(t *testing.T) {
 
-	for {
-		time.Sleep(7 * time.Second)
-		go doSomething("from polling 1")
-	}
+	appDetails := App{}
 
-	//key := ApplicationStat{AppName: "app name", SpaceName: "app space", OrgName: "org"}
-	//
-	//b, err := json.Marshal(key)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//fmt.Println(string(b))
+	appDetails.InstanceCount = doSomething("")
+
+	spew.Dump(appDetails)
 }
 
-func doSomething(s string) {
+func doSomething(s string) InstanceCount{
 	fmt.Println("doing something", s)
+	return InstanceCount{Configured:3,Running:2}
 }

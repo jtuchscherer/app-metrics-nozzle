@@ -28,21 +28,22 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/cloudfoundry-community/firehose-to-syslog/firehose"
-	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/jtgammon/go-cfclient"
+
 	"app-usage-nozzle/service"
 	"app-usage-nozzle/usageevents"
 )
 
 var (
-	debug             = kingpin.Flag("debug", "Enable debug mode. This disables forwarding to syslog").Default("false").OverrideDefaultFromEnvar("DEBUG").Bool()
-	apiEndpoint       = kingpin.Flag("api-endpoint", "Api endpoint address. For bosh-lite installation of CF: https://api.10.244.0.34.xip.io").OverrideDefaultFromEnvar("API_ENDPOINT").Required().String()
-	dopplerEndpoint   = kingpin.Flag("doppler-endpoint", "Overwrite default doppler endpoint return by /v2/info").OverrideDefaultFromEnvar("DOPPLER_ENDPOINT").String()
-	subscriptionID    = kingpin.Flag("subscription-id", "Id for the subscription.").Default("firehose").OverrideDefaultFromEnvar("FIREHOSE_SUBSCRIPTION_ID").String()
-	user              = kingpin.Flag("user", "Admin user.").Default("admin").OverrideDefaultFromEnvar("FIREHOSE_USER").String()
-	password          = kingpin.Flag("password", "Admin password.").Default("admin").OverrideDefaultFromEnvar("FIREHOSE_PASSWORD").String()
+	debug = kingpin.Flag("debug", "Enable debug mode. This disables forwarding to syslog").Default("false").OverrideDefaultFromEnvar("DEBUG").Bool()
+	apiEndpoint = kingpin.Flag("api-endpoint", "Api endpoint address. For bosh-lite installation of CF: https://api.10.244.0.34.xip.io").OverrideDefaultFromEnvar("API_ENDPOINT").Required().String()
+	dopplerEndpoint = kingpin.Flag("doppler-endpoint", "Overwrite default doppler endpoint return by /v2/info").OverrideDefaultFromEnvar("DOPPLER_ENDPOINT").String()
+	subscriptionID = kingpin.Flag("subscription-id", "Id for the subscription.").Default("firehose").OverrideDefaultFromEnvar("FIREHOSE_SUBSCRIPTION_ID").String()
+	user = kingpin.Flag("user", "Admin user.").Default("admin").OverrideDefaultFromEnvar("FIREHOSE_USER").String()
+	password = kingpin.Flag("password", "Admin password.").Default("admin").OverrideDefaultFromEnvar("FIREHOSE_PASSWORD").String()
 	skipSSLValidation = kingpin.Flag("skip-ssl-validation", "Please don't").Default("false").OverrideDefaultFromEnvar("SKIP_SSL_VALIDATION").Bool()
-	boltDatabasePath  = kingpin.Flag("boltdb-path", "Bolt Database path ").Default("my.db").OverrideDefaultFromEnvar("BOLTDB_PATH").String()
-	tickerTime        = kingpin.Flag("cc-pull-time", "CloudController Polling time in sec").Default("60s").OverrideDefaultFromEnvar("CF_PULL_TIME").Duration()
+	boltDatabasePath = kingpin.Flag("boltdb-path", "Bolt Database path ").Default("my.db").OverrideDefaultFromEnvar("BOLTDB_PATH").String()
+	tickerTime = kingpin.Flag("cc-pull-time", "CloudController Polling time in sec").Default("60s").OverrideDefaultFromEnvar("CF_PULL_TIME").Duration()
 )
 
 const (
@@ -76,7 +77,7 @@ func main() {
 		Password:          *password,
 		SkipSslValidation: *skipSSLValidation,
 	}
-	cfClient := cfclient.NewClient(&c)
+	cfClient, _ := cfclient.NewClient(&c)
 
 	if len(*dopplerEndpoint) > 0 {
 		cfClient.Endpoint.DopplerEndpoint = *dopplerEndpoint
@@ -105,6 +106,27 @@ func main() {
 		app := apps[idx].Name
 		key := usageevents.GetMapKeyFromAppData(org, space, app)
 		usageevents.AppStats[key] = usageevents.ApplicationStat{AppName: app, SpaceName: space, OrgName: org}
+
+		orgId := apps[idx].OrgGuid
+		spaceId := apps[idx].SpaceGuid
+		appId := apps[idx].Guid
+		name := apps[idx].Name
+
+		appDetail := usageevents.App{GUID:appId, Name:name}
+
+		appDetail = usageevents.App{GUID:appId, Name:name}
+		appDetail.Organization.ID = orgId
+		appDetail.Organization.Name = org
+
+		appDetail.Space.ID = spaceId
+		appDetail.Space.Name = space
+
+		cloudControllerData := usageevents.PullCloudControllerData(appId)
+		appDetail.InstanceCount.Configured = cloudControllerData.Configured
+		appDetail.InstanceCount.Running = cloudControllerData.Running
+
+		usageevents.AppDetails[key] = appDetail
+
 	}
 
 	logger.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))
@@ -116,13 +138,14 @@ func main() {
 		for range ccPolling.C {
 			logger.Println("Re-loading application cache.")
 			apps = caching.GetAllApp()
+			//todo call update uppdetails here for now
 		}
 	}()
 
-	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, cfClient.GetToken(), *subscriptionID, *skipSSLValidation)
+	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, cfclient.Config.Token, *subscriptionID, *skipSSLValidation)
 	if firehose != nil {
-		logger.Println("Firehose Subscription Succesfull! Routing events...")
 		usageevents.ProcessEvents(firehose)
+		logger.Println("Firehose Subscription Succesfull! Routing events...")
 	} else {
 		logger.Fatal("Failed connecting to Firehose...Please check settings and try again!")
 	}

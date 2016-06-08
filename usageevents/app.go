@@ -1,6 +1,11 @@
 package usageevents
 
 //http://json2struct.mervine.net/
+type InstanceCount  struct {
+	Configured int `json:"configured"`
+	Running    int `json:"running"`
+}
+
 type App struct {
 	Buildpack            string `json:"build pack"`
 	ElapsedSinceLastEvent int    `json:"elapsed_since_last_event"`
@@ -17,10 +22,7 @@ type App struct {
 			      } `json:"environment_summary"`
 	EventCount            int    `json:"event_count"`
 	GUID                  string `json:"guid"`
-	InstanceCount         struct {
-				      Configured int `json:"configured"`
-				      Running    int `json:"running"`
-			      } `json:"instance_count"`
+	InstanceCount          `json:"instance_count"`
 	Instances             []struct {
 		CPUUsage    string `json:"cpu_usage"`
 		DiskQuota   string `json:"disk_quota"`
