@@ -23,9 +23,10 @@ import (
 	"sync"
 	"time"
 	"github.com/cloudfoundry/sonde-go/events"
-	"github.com/cloudfoundry-community/go-cfclient"
+	cfclient "github.com/jtgammon/go-cfclient"
 	"os"
-	"github.com/davecgh/go-spew/spew"
+	"strings"
+	"strconv"
 )
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
@@ -80,9 +81,10 @@ func ProcessEvents(in chan *events.Envelope) {
 	}
 }
 
-func LoadCcData()  {
+func PullCloudControllerData(appId string) InstanceCount {
+
 	logger := log.New(os.Stdout, "", 0)
-	logger.Println("Re-loading application cache.")
+	logger.Println("Re-loading application data from Cloud Controller." + appId)
 
 	c := cfclient.Config{
 		ApiAddress:        "https://api.run.haas-41.pez.pivotal.io",
@@ -90,13 +92,29 @@ func LoadCcData()  {
 		Password:          "cb0a40f8d6360eaed442",
 		SkipSslValidation: true,
 	}
-	client := cfclient.NewClient(&c)
-	apps := client.ListApps()
+	client,_ := cfclient.NewClient(&c)
 
-	spew.Dump(apps)
+	app,_ := client.AppByGuid(appId)
 
+	instances,_ := client.GetAppInstances(app.Guid)
+	runnintCount := 0
+	instanceUp := "RUNNING"
+
+	for _, eachInstance := range instances {
+		if strings.Compare(instanceUp, eachInstance.State) == 0 {
+			runnintCount++;
+		}
+	}
+
+	//todo need to review this
+	space := app.Space()
+	org := space.Org()
+
+	appKey := GetMapKeyFromAppData(space.Name, org.Name, app.Name)
+
+	logger.Println("-->" + appKey + "---" + strconv.Itoa(runnintCount) + "/" + strconv.Itoa(len(instances)))
+	return InstanceCount{Configured:len(instances), Running:runnintCount}
 }
-
 
 func processEvent(msg *events.Envelope) {
 	eventType := msg.GetEventType()
@@ -130,7 +148,7 @@ func GetMapKeyFromAppData(orgName string, spaceName string, appName string) stri
 	return fmt.Sprintf("%s/%s/%s", orgName, spaceName, appName)
 }
 
-func updateAppDetails(logEvent Event)  {
+func updateAppDetails(logEvent Event) {
 	appName := logEvent.AppName
 	appOrg := logEvent.OrgName
 	appSpace := logEvent.SpaceName
@@ -197,7 +215,7 @@ func LogMessage(msg *events.Envelope) Event {
 
 func Reverse(s string) string {
 	r := []rune(s)
-	for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
+	for i, j := 0, len(r) - 1; i < len(r) / 2; i, j = i + 1, j - 1 {
 		r[i], r[j] = r[j], r[i]
 	}
 	return string(r)
