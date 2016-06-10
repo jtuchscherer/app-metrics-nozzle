@@ -27,13 +27,13 @@ type App struct {
 
 	Environment           map[string]interface{} `json:"environment"`
 	EnvironmentSummary    struct {
-				      TotalCPU               string `json:"total_cpu"`          //todo calculate from instances add these from instances
+				      TotalCPU               float64 `json:"total_cpu"`          //todo calculate from instances add these from instances
 				      TotalDiskConfigured   int32 `json:"total_disk_configured"`
 				      TotalDiskProvisioned   int32 `json:"total_disk_provisioned"`
-				      TotalDiskUsage         string `json:"total_disk_usage"`   //todo calculate from instances add these from instances
+				      TotalDiskUsage         uint64 `json:"total_disk_usage"`   //todo calculate from instances add these from instances
 				      TotalMemoryConfigured int32 `json:"total_memory_congigured"`
 				      TotalMemoryProvisioned int32 `json:"total_memory_provisioned"`
-				      TotalMemoryUsage       string `json:"total_memory_usage"` //todo calculate from instances add these from instances
+				      TotalMemoryUsage       uint64 `json:"total_memory_usage"` //todo calculate from instances add these from instances
 			      } `json:"environment_summary"`
 	GUID                  string `json:"guid"`
 	InstanceCount          `json:"instance_count"`
