@@ -28,7 +28,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/cloudfoundry-community/firehose-to-syslog/firehose"
-	"github.com/jtgammon/go-cfclient"
+	jgClient "github.com/jtgammon/go-cfclient"
 
 	"app-usage-nozzle/service"
 	"app-usage-nozzle/usageevents"
@@ -71,13 +71,13 @@ func main() {
 
 	logger.Println(fmt.Sprintf("Starting app-usage-nozzle %s ", version))
 
-	c := cfclient.Config{
+	c := jgClient.Config{
 		ApiAddress:        *apiEndpoint,
 		Username:          *user,
 		Password:          *password,
 		SkipSslValidation: *skipSSLValidation,
 	}
-	cfClient, _ := cfclient.NewClient(&c)
+	cfClient, _ := jgClient.NewClient(&c)
 
 	if len(*dopplerEndpoint) > 0 {
 		cfClient.Endpoint.DopplerEndpoint = *dopplerEndpoint
@@ -107,26 +107,13 @@ func main() {
 		key := usageevents.GetMapKeyFromAppData(org, space, app)
 		usageevents.AppStats[key] = usageevents.ApplicationStat{AppName: app, SpaceName: space, OrgName: org}
 
-		orgId := apps[idx].OrgGuid
-		spaceId := apps[idx].SpaceGuid
 		appId := apps[idx].Guid
 		name := apps[idx].Name
 
 		appDetail := usageevents.App{GUID:appId, Name:name}
-
-		appDetail = usageevents.App{GUID:appId, Name:name}
-		appDetail.Organization.ID = orgId
-		appDetail.Organization.Name = org
-
-		appDetail.Space.ID = spaceId
-		appDetail.Space.Name = space
-
-		cloudControllerData := usageevents.PullCloudControllerData(appId)
-		appDetail.InstanceCount.Configured = cloudControllerData.Configured
-		appDetail.InstanceCount.Running = cloudControllerData.Running
-
 		usageevents.AppDetails[key] = appDetail
 
+		usageevents.UpdateCloudContollerData(appId)
 	}
 
 	logger.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))
@@ -142,7 +129,9 @@ func main() {
 		}
 	}()
 
-	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, cfclient.Config.Token, *subscriptionID, *skipSSLValidation)
+	token, _ := cfClient.GetToken()
+
+	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, token, *subscriptionID, *skipSSLValidation)
 	if firehose != nil {
 		usageevents.ProcessEvents(firehose)
 		logger.Println("Firehose Subscription Succesfull! Routing events...")
