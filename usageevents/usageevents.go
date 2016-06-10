@@ -27,6 +27,7 @@ import (
 	"os"
 	"strings"
 	"strconv"
+	//"github.com/davecgh/go-spew/spew"
 )
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
@@ -44,6 +45,11 @@ type Event struct {
 	SpaceName      string `json:"space_name"`
 	OrgID          string `json:"org_id"`
 	SpaceID        string `json:"space_id"`
+	CellIP	       string `json:"cell_ip"`
+	InstanceIndex  int32  `json:"instance_index"`
+	CPUPercentage  float64 `json:"cpu_percentage"`
+	MemBytes       uint64 `json:"mem_bytes"`
+	DiskBytes      uint64 `json:"disk_bytes"`
 }
 
 // ApplicationStat represents the observed metadata about an app, e.g. last router event time, etc.
@@ -81,7 +87,7 @@ func ProcessEvents(in chan *events.Envelope) {
 	}
 }
 
-func PullCloudControllerData(appId string) InstanceCount {
+func UpdateCloudContollerData(appId string) {
 
 	logger := log.New(os.Stdout, "", 0)
 	logger.Println("Re-loading application data from Cloud Controller." + appId)
@@ -92,28 +98,68 @@ func PullCloudControllerData(appId string) InstanceCount {
 		Password:          "***REMOVED***",
 		SkipSslValidation: true,
 	}
-	client,_ := cfclient.NewClient(&c)
+	client, _ := cfclient.NewClient(&c)
 
-	app,_ := client.AppByGuid(appId)
+	app, _ := client.AppByGuid(appId)
 
-	instances,_ := client.GetAppInstances(app.Guid)
+	instances, _ := client.GetAppInstances(app.Guid)
 	runnintCount := 0
 	instanceUp := "RUNNING"
 
-	for _, eachInstance := range instances {
+	space, _ := app.Space()
+	org, _ := space.Org()
+
+	appKey := GetMapKeyFromAppData(org.Name, space.Name, app.Name)
+
+	logger.Println("-->" + appKey + "---" + strconv.Itoa(runnintCount) + "/" + strconv.Itoa(len(instances)))
+
+	appDetail := AppDetails[appKey]
+	appDetail.Diego = app.Diego
+	appDetail.Buildpack = app.Buildpack
+	appDetail.Instances = make([]Instances, int64(len(instances)))
+
+	for idx, eachInstance := range instances {
 		if strings.Compare(instanceUp, eachInstance.State) == 0 {
 			runnintCount++;
 		}
+		i, _ := strconv.ParseInt(idx, 10, 32)
+		appDetail.Instances[i].InstanceIndex = i
+		appDetail.Instances[i].State = eachInstance.State
+		appDetail.Instances[i].Since = eachInstance.Since
+		appDetail.Instances[i].Uptime = eachInstance.Uptime
 	}
 
-	//todo need to review this
-	space := app.Space()
-	org := space.Org()
 
-	appKey := GetMapKeyFromAppData(space.Name, org.Name, app.Name)
+	if len(appDetail.Buildpack) == 0 { appDetail.Buildpack = app.DetectedBP }
 
-	logger.Println("-->" + appKey + "---" + strconv.Itoa(runnintCount) + "/" + strconv.Itoa(len(instances)))
-	return InstanceCount{Configured:len(instances), Running:runnintCount}
+	appDetail.Environment = app.Environment
+
+	appDetail.Organization.ID = org.Guid
+	appDetail.Organization.Name = org.Name
+
+	appDetail.Space.ID = space.Guid
+	appDetail.Space.Name = space.Name
+
+	appDetail.InstanceCount.Configured = len(instances)
+	appDetail.InstanceCount.Running = runnintCount
+
+	appDetail.EnvironmentSummary.TotalDiskConfigured = app.DiskQuota
+	appDetail.EnvironmentSummary.TotalMemoryConfigured = app.MemQuota
+
+	appDetail.EnvironmentSummary.TotalDiskProvisioned = app.DiskQuota * int32(len(instances))
+	appDetail.EnvironmentSummary.TotalMemoryProvisioned = app.MemQuota * int32(len(instances))
+
+	if 0 < len(app.RouteData) {
+		appDetail.Routes = make([]string, len(app.RouteData))
+		for i := 0; i < len(app.RouteData); i++ {
+			appDetail.Routes[i] = app.RouteData[i].Entity.Host + "." + app.RouteData[i].Entity.DomainData.Entity.Name
+		}
+	}
+
+	appDetail.State = app.State
+
+
+	AppDetails[appKey] = appDetail
 }
 
 func processEvent(msg *events.Envelope) {
@@ -124,12 +170,38 @@ func processEvent(msg *events.Envelope) {
 		event = LogMessage(msg)
 		if event.SourceType == "RTR" {
 			event.AnnotateWithAppData()
+			//logger := log.New(os.Stdout, "", 0)
+			//logger.Println("-------> Log message to parse " + event.Msg + " org " + event.OrgName + " space " + event.SpaceName)
 			updateAppStat(event)
+		}
+
+		if event.SourceType == "APP" {
+			event.AnnotateWithAppData()
 			updateAppDetails(event)
 		}
 	}
+
+	if eventType == events.Envelope_ContainerMetric {
+		event = ContainerMetric(msg)
+		event.AnnotateWithAppData()
+		updateAppDetails(event)
+	}
 }
 
+func ContainerMetric(msg *events.Envelope) Event {
+	message := msg.GetContainerMetric()
+
+	return Event{
+		Origin:         msg.GetOrigin(),
+		Type:           msg.GetEventType().String(),
+		AppID:          message.GetApplicationId(),
+		CellIP:		*msg.Ip,
+		InstanceIndex:  message.GetInstanceIndex(),
+		CPUPercentage:  message.GetCpuPercentage(),
+		MemBytes:       message.GetMemoryBytes(),
+		DiskBytes:      message.GetDiskBytes(),
+	}
+}
 // CalculateDetailedStat takes application stats, uses the clock time, and calculates elapsed times and requests/second.
 func CalculateDetailedStat(stat ApplicationStat) (detail ApplicationDetail) {
 	detail.Stats = stat
@@ -148,25 +220,48 @@ func GetMapKeyFromAppData(orgName string, spaceName string, appName string) stri
 	return fmt.Sprintf("%s/%s/%s", orgName, spaceName, appName)
 }
 
-func updateAppDetails(logEvent Event) {
-	appName := logEvent.AppName
-	appOrg := logEvent.OrgName
-	appSpace := logEvent.SpaceName
+func updateAppDetails(event Event) {
+
+	appName := event.AppName
+	appOrg := event.OrgName
+	appSpace := event.SpaceName
 
 	appKey := GetMapKeyFromAppData(appOrg, appSpace, appName)
 	appDetail := AppDetails[appKey]
 	appDetail.Organization.Name = appOrg
-	appDetail.Organization.ID = logEvent.OrgID
+	appDetail.Organization.ID = event.OrgID
 	appDetail.Space.Name = appSpace
-	appDetail.Space.ID = logEvent.SpaceID
+	appDetail.Space.ID = event.SpaceID
 	appDetail.Name = appName
-	appDetail.GUID = logEvent.AppID
-	appDetail.EventCount++
-	appDetail.LastEvent.Message = logEvent.Msg
-	appDetail.LastEvent.Timestamp = logEvent.Timestamp
+	appDetail.GUID = event.AppID
+
+	if 0 < len(appDetail.Instances) {
+		appDetail.Instances[event.InstanceIndex].CellIP = event.CellIP
+		appDetail.Instances[event.InstanceIndex].CPUUsage = event.CPUPercentage
+		appDetail.Instances[event.InstanceIndex].MemoryUsage = event.MemBytes
+		appDetail.Instances[event.InstanceIndex].DiskUsage = event.DiskBytes
+	}
+
+	gcStatsMarker := "[GC"
+	if strings.Contains(event.Msg, gcStatsMarker){
+		i, _ := strconv.ParseInt(event.SourceInstance, 10, 32)
+
+		logger := log.New(os.Stdout, "", 0)
+		logMsg := fmt.Sprintf("LOG GC messge %s--%s--%s", appOrg, appName, i)
+		logger.Println(logMsg)
+
+		appDetail.Instances[i].GcStats = event.Msg
+	}
+
+	appStats := AppStats[appKey]
+	appDetail.RequestsPerSecond = appStats.LastEventRPS
+	appDetail.EventCount = appStats.EventCount
+	appDetail.LastEventTime = appStats.LastEventTime
+
+	eventElapsed := time.Now().UnixNano() - appStats.LastEventTime
+	appDetail.ElapsedSinceLastEvent = eventElapsed / 1000000000
 
 	AppDetails[appKey] = appDetail
-
 }
 
 func updateAppStat(logEvent Event) {

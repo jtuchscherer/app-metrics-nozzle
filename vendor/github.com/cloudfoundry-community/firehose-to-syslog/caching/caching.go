@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/boltdb/bolt"
 	log "github.com/cloudfoundry-community/firehose-to-syslog/logging"
-	cfClient "github.com/cloudfoundry-community/go-cfclient"
+	cfClient "github.com/jtgammon/go-cfclient"
 	json "github.com/pquerna/ffjson/ffjson"
 )
 
@@ -60,7 +60,7 @@ func FillDatabase(listApps []App) {
 
 func GetAppByGuid(appGuid string) []App {
 	var apps []App
-	app := gcfClient.AppByGuid(appGuid)
+	app, _ := gcfClient.AppByGuid(appGuid)
 	apps = append(apps, App{app.Name, app.Guid, app.SpaceData.Entity.Name, app.SpaceData.Entity.Guid, app.SpaceData.Entity.OrgData.Entity.Name, app.SpaceData.Entity.OrgData.Entity.Guid})
 	FillDatabase(apps)
 	return apps
@@ -78,7 +78,9 @@ func GetAllApp() []App {
 		}
 	}()
 
-	for _, app := range gcfClient.ListApps() {
+	listedApps, _ := gcfClient.ListApps()
+
+	for _, app := range listedApps {
 		log.LogStd(fmt.Sprintf("App [%s] Found...", app.Name), false)
 		apps = append(apps, App{app.Name, app.Guid, app.SpaceData.Entity.Name, app.SpaceData.Entity.Guid, app.SpaceData.Entity.OrgData.Entity.Name, app.SpaceData.Entity.OrgData.Entity.Guid})
 	}
