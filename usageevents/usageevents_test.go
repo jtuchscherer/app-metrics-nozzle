@@ -8,23 +8,32 @@ import (
 	//"time"
 	//"github.com/davecgh/go-spew/spew"
 	//"github.com/pivotalservices/app-usage-nozzle/usageevents"
-	"strings"
+	//"strings"
+	"strconv"
+	"os"
+	"log"
 )
 
 
 
 func TestReverse(t *testing.T) {
-	appDetail := App{GUID:"asdfadsfa", Name:"my app"}
-	appDetail.Routes = make([]string, 3)
-	appDetail.Routes[0] = "zero"
-	appDetail.Routes[1] = "one"
-	appDetail.Routes[2] = "two"
-	//fmt.Println(appDetail.Routes)
 
-	msg := "2016-06-09T14:35:58.087+0000: [GC (Allocation Failure) [PSYoungGen: 229368K->32759K(229376K)] 247484K->58983K(753664K), 0.0168215 secs] [Times: user=0.05 sys=0.01, real=0.01 secs] "
+	var instance int32 = 1
+	var totalCPU float64 = 0.2
+	var totalDiskUsage uint64 = 1
+	var totalMemoryUsage uint64 = 1
 
-	gcStatsMarker := "[GC"
-	fmt.Println(strings.Contains(msg, gcStatsMarker))
+	totalCPU = totalCPU + .3
+	totalDiskUsage = totalDiskUsage + 1
+	totalMemoryUsage = totalMemoryUsage + 1
+
+	logMsg := fmt.Sprintf("LOG GC messge instance %s %s--%s--%s", fmt.Sprintf("%v",instance),
+		strconv.FormatFloat(totalCPU, 'f', 6, 64),
+		strconv.FormatUint(totalDiskUsage, 10),
+		strconv.FormatUint(totalMemoryUsage, 10))
+
+	logger := log.New(os.Stdout, "", 0)
+	logger.Println(logMsg)
 
 }
 

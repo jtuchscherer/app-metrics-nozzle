@@ -129,7 +129,6 @@ func UpdateCloudContollerData(appId string) {
 		appDetail.Instances[i].Uptime = eachInstance.Uptime
 	}
 
-
 	if len(appDetail.Buildpack) == 0 { appDetail.Buildpack = app.DetectedBP }
 
 	appDetail.Environment = app.Environment
@@ -235,20 +234,31 @@ func updateAppDetails(event Event) {
 	appDetail.Name = appName
 	appDetail.GUID = event.AppID
 
+	var totalCPU float64 = 0
+	var totalDiskUsage uint64 = 0
+	var totalMemoryUsage uint64 = 0
+
 	if 0 < len(appDetail.Instances) {
+
 		appDetail.Instances[event.InstanceIndex].CellIP = event.CellIP
 		appDetail.Instances[event.InstanceIndex].CPUUsage = event.CPUPercentage
 		appDetail.Instances[event.InstanceIndex].MemoryUsage = event.MemBytes
 		appDetail.Instances[event.InstanceIndex].DiskUsage = event.DiskBytes
+
+		for i := 0; i < len(appDetail.Instances); i++ {
+			totalCPU = totalCPU + event.CPUPercentage
+			totalDiskUsage = totalDiskUsage + event.DiskBytes
+			totalMemoryUsage = totalMemoryUsage + event.MemBytes
+		}
 	}
+
+	appDetail.EnvironmentSummary.TotalCPU = totalCPU
+	appDetail.EnvironmentSummary.TotalDiskUsage = totalDiskUsage
+	appDetail.EnvironmentSummary.TotalMemoryUsage = totalMemoryUsage
 
 	gcStatsMarker := "[GC"
 	if strings.Contains(event.Msg, gcStatsMarker){
 		i, _ := strconv.ParseInt(event.SourceInstance, 10, 32)
-
-		logger := log.New(os.Stdout, "", 0)
-		logMsg := fmt.Sprintf("LOG GC messge %s--%s--%s", appOrg, appName, i)
-		logger.Println(logMsg)
 
 		appDetail.Instances[i].GcStats = event.Msg
 	}
