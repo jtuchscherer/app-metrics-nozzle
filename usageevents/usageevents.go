@@ -92,6 +92,7 @@ func UpdateCloudContollerData(appId string) {
 	logger := log.New(os.Stdout, "", 0)
 	logger.Println("Re-loading application data from Cloud Controller." + appId)
 
+//todo these should come from env variables
 	c := cfclient.Config{
 		ApiAddress:        "https://api.run.haas-41.pez.pivotal.io",
 		Username:          "admin",
@@ -169,8 +170,6 @@ func processEvent(msg *events.Envelope) {
 		event = LogMessage(msg)
 		if event.SourceType == "RTR" {
 			event.AnnotateWithAppData()
-			//logger := log.New(os.Stdout, "", 0)
-			//logger.Println("-------> Log message to parse " + event.Msg + " org " + event.OrgName + " space " + event.SpaceName)
 			updateAppStat(event)
 		}
 
