@@ -43,6 +43,6 @@ func initRoutes(mx *mux.Router, formatter *render.Render) {
 	mx.HandleFunc("/api/apps/details/{org}/{space}", appSpaceHandler(formatter)).Methods("GET")
 	mx.HandleFunc("/api/apps/details/{org}", appOrgHandler(formatter)).Methods("GET")
 	mx.HandleFunc("/api/apps/details", appAllHandler(formatter)).Methods("GET")
-	mx.HandleFunc("/api/apps/{org}/{space}/{app}", singleAppHandler(formatter)).Methods("GET")
-	mx.HandleFunc("/api/apps", appCollectionHandler(formatter)).Methods("GET")
+	//mx.HandleFunc("/api/apps/{org}/{space}/{app}", singleAppHandler(formatter)).Methods("GET")
+	//mx.HandleFunc("/api/apps", appCollectionHandler(formatter)).Methods("GET")
 }
