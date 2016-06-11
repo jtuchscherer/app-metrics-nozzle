@@ -24,10 +24,7 @@ import (
 	"github.com/cloudfoundry/sonde-go/events"
 	"strings"
 	"strconv"
-	//"github.com/davecgh/go-spew/spew"
-	//"app-usage-nozzle/api"
 	"app-usage-nozzle/domain"
-	//"github.com/davecgh/go-spew/spew"
 	"os"
 	"log"
 )
@@ -56,8 +53,6 @@ type Event struct {
 
 var mutex sync.Mutex
 
-// AppStats is a map of app names to collected stats.
-//var AppStats = make(map[string]ApplicationStat)
 var logger = log.New(os.Stdout, "", 0)
 
 var AppDetails = make(map[string]domain.App)
@@ -74,9 +69,6 @@ func ProcessEvents(in chan *events.Envelope) {
 
 func processEvent(msg *events.Envelope) {
 	eventType := msg.GetEventType()
-
-	//todo currently events overwrite data from each other - need to update different sections of the json per event type
-
 
 	var event Event
 	if eventType == events.Envelope_LogMessage {

@@ -73,7 +73,6 @@ func searchApps(searchKey string, w http.ResponseWriter, formatter *render.Rende
 	}
 
 	if 0 < len(foundApps) {
-		//todo calc needed statistics before serving
 		formatter.JSON(w, http.StatusOK, foundApps)
 	} else {
 		formatter.JSON(w, http.StatusNotFound, "No such app")
@@ -91,7 +90,6 @@ func appHandler(formatter *render.Render) http.HandlerFunc {
 		org := vars["org"]
 		space := vars["space"]
 		key := usageevents.GetMapKeyFromAppData(org, space, app)
-		fmt.Printf("Retrieving app at key : %s\n", key)
 		stat, exists := usageevents.AppDetails[key]
 
 		if exists {
@@ -102,31 +100,3 @@ func appHandler(formatter *render.Render) http.HandlerFunc {
 		}
 	}
 }
-//
-//func appCollectionHandler(formatter *render.Render) http.HandlerFunc {
-//	return func(w http.ResponseWriter, req *http.Request) {
-//		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
-//		w.Header().Add("Access-Control-Allow-Methods", "GET")
-//		formatter.JSON(w, http.StatusOK, usageevents.AppStats)
-//	}
-//}
-//
-//func singleAppHandler(formatter *render.Render) http.HandlerFunc {
-//	return func(w http.ResponseWriter, req *http.Request) {
-//		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
-//		w.Header().Add("Access-Control-Allow-Methods", "GET")
-//		vars := mux.Vars(req)
-//		app := vars["app"]
-//		org := vars["org"]
-//		space := vars["space"]
-//		key := usageevents.GetMapKeyFromAppData(org, space, app)
-//
-//		fmt.Printf("Retrieving app at key : %s\n", key)
-//		stat, exists := usageevents.AppStats[key]
-//		if exists {
-//			formatter.JSON(w, http.StatusOK, usageevents.CalculateDetailedStat(stat))
-//		} else {
-//			formatter.JSON(w, http.StatusNotFound, "No such app")
-//		}
-//	}
-//}
