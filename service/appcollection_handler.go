@@ -24,6 +24,7 @@ import (
 	"app-usage-nozzle/usageevents"
 	"github.com/unrolled/render"
 	"strings"
+	"app-usage-nozzle/domain"
 )
 
 func appAllHandler(formatter *render.Render) http.HandlerFunc {
@@ -63,7 +64,7 @@ func appSpaceHandler(formatter *render.Render) http.HandlerFunc {
 
 func searchApps(searchKey string, w http.ResponseWriter, formatter *render.Render) {
 	allAppDetails := usageevents.AppDetails
-	foundApps := make(map[string]usageevents.App)
+	foundApps := make(map[string]domain.App)
 
 	for idx, appDetail := range allAppDetails {
 		if strings.HasPrefix(idx, searchKey) {
@@ -101,31 +102,31 @@ func appHandler(formatter *render.Render) http.HandlerFunc {
 		}
 	}
 }
-
-func appCollectionHandler(formatter *render.Render) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
-		w.Header().Add("Access-Control-Allow-Methods", "GET")
-		formatter.JSON(w, http.StatusOK, usageevents.AppStats)
-	}
-}
-
-func singleAppHandler(formatter *render.Render) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
-		w.Header().Add("Access-Control-Allow-Methods", "GET")
-		vars := mux.Vars(req)
-		app := vars["app"]
-		org := vars["org"]
-		space := vars["space"]
-		key := usageevents.GetMapKeyFromAppData(org, space, app)
-
-		fmt.Printf("Retrieving app at key : %s\n", key)
-		stat, exists := usageevents.AppStats[key]
-		if exists {
-			formatter.JSON(w, http.StatusOK, usageevents.CalculateDetailedStat(stat))
-		} else {
-			formatter.JSON(w, http.StatusNotFound, "No such app")
-		}
-	}
-}
+//
+//func appCollectionHandler(formatter *render.Render) http.HandlerFunc {
+//	return func(w http.ResponseWriter, req *http.Request) {
+//		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+//		w.Header().Add("Access-Control-Allow-Methods", "GET")
+//		formatter.JSON(w, http.StatusOK, usageevents.AppStats)
+//	}
+//}
+//
+//func singleAppHandler(formatter *render.Render) http.HandlerFunc {
+//	return func(w http.ResponseWriter, req *http.Request) {
+//		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+//		w.Header().Add("Access-Control-Allow-Methods", "GET")
+//		vars := mux.Vars(req)
+//		app := vars["app"]
+//		org := vars["org"]
+//		space := vars["space"]
+//		key := usageevents.GetMapKeyFromAppData(org, space, app)
+//
+//		fmt.Printf("Retrieving app at key : %s\n", key)
+//		stat, exists := usageevents.AppStats[key]
+//		if exists {
+//			formatter.JSON(w, http.StatusOK, usageevents.CalculateDetailedStat(stat))
+//		} else {
+//			formatter.JSON(w, http.StatusNotFound, "No such app")
+//		}
+//	}
+//}

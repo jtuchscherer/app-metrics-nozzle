@@ -1,4 +1,4 @@
-package usageevents
+package domain
 
 //import "github.com/cloudfoundry-community/firehose-to-syslog/Godeps/_workspace/src/github.com/cloudfoundry/sonde-go/events"
 

@@ -26,12 +26,14 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/boltdb/bolt"
-	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/cloudfoundry-community/firehose-to-syslog/firehose"
 	jgClient "github.com/jtgammon/go-cfclient"
 
 	"app-usage-nozzle/service"
 	"app-usage-nozzle/usageevents"
+	"app-usage-nozzle/domain"
+	"app-usage-nozzle/api"
+	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 )
 
 var (
@@ -105,15 +107,15 @@ func main() {
 		space := apps[idx].SpaceName
 		app := apps[idx].Name
 		key := usageevents.GetMapKeyFromAppData(org, space, app)
-		usageevents.AppStats[key] = usageevents.ApplicationStat{AppName: app, SpaceName: space, OrgName: org}
+		//usageevents.AppStats[key] = usageevents.ApplicationStat{AppName: app, SpaceName: space, OrgName: org}
 
 		appId := apps[idx].Guid
 		name := apps[idx].Name
 
-		appDetail := usageevents.App{GUID:appId, Name:name}
+		appDetail := domain.App{GUID:appId, Name:name}
+		api.AnnotateWithCloudControllerData(&appDetail)
 		usageevents.AppDetails[key] = appDetail
-
-		usageevents.UpdateCloudContollerData(appId)
+		logger.Println(fmt.Sprintf("Registered [%d]", key))
 	}
 
 	logger.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))
