@@ -13,12 +13,16 @@ var logger = log.New(os.Stdout, "", 0)
 var client *cfclient.Client
 
 func init(){
+
+	skipSsl, _ := strconv.ParseBool(os.Getenv("SKIP_SSL_VALIDATION"))
 	c := cfclient.Config{
-		ApiAddress:        "https://api.run.haas-41.pez.pivotal.io",
-		Username:          "admin",
-		Password:          "cb0a40f8d6360eaed442",
-		SkipSslValidation: true,
+		ApiAddress:        os.Getenv("API_ENDPOINT"),
+		Username:          os.Getenv("FIREHOSE_USER"),
+		Password:          os.Getenv("FIREHOSE_PASSWORD"),
+		SkipSslValidation: skipSsl,
 	}
+
+	logger.Println("Processing Cloud Controller call to " + os.Getenv("API_ENDPOINT"))
 	client, _ = cfclient.NewClient(&c)
 }
 

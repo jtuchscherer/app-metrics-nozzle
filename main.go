@@ -107,7 +107,6 @@ func main() {
 		space := apps[idx].SpaceName
 		app := apps[idx].Name
 		key := usageevents.GetMapKeyFromAppData(org, space, app)
-		//usageevents.AppStats[key] = usageevents.ApplicationStat{AppName: app, SpaceName: space, OrgName: org}
 
 		appId := apps[idx].Guid
 		name := apps[idx].Name
@@ -115,7 +114,7 @@ func main() {
 		appDetail := domain.App{GUID:appId, Name:name}
 		api.AnnotateWithCloudControllerData(&appDetail)
 		usageevents.AppDetails[key] = appDetail
-		logger.Println(fmt.Sprintf("Registered [%d]", key))
+		logger.Println(fmt.Sprintf("Registered [%s]", key))
 	}
 
 	logger.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))

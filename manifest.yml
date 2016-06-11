@@ -9,3 +9,7 @@ applications:
 env:
   GOVERSION: go1.6
   GOPACKAGENAME: app-usage-nozzle
+  API_ENDPOINT: https://api.run.haas-41.pez.pivotal.io
+  FIREHOSE_USER: admin
+  FIREHOSE_PASSWORD: cb0a40f8d6360eaed442
+  SKIP_SSL_VALIDATION: true
