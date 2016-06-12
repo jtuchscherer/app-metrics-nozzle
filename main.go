@@ -44,6 +44,7 @@ var (
 	user = kingpin.Flag("user", "Admin user.").Default("admin").OverrideDefaultFromEnvar("FIREHOSE_USER").String()
 	password = kingpin.Flag("password", "Admin password.").Default("admin").OverrideDefaultFromEnvar("FIREHOSE_PASSWORD").String()
 	skipSSLValidation = kingpin.Flag("skip-ssl-validation", "Please don't").Default("false").OverrideDefaultFromEnvar("SKIP_SSL_VALIDATION").Bool()
+	cloudControllerRefreshMin = kingpin.Flag("cloud-control-refresh-min", "Cloud Controller API call interval in minutes").OverrideDefaultFromEnvar("CLOUD_CONTROLLER_REFRESH_MIN").Int()
 	boltDatabasePath = kingpin.Flag("boltdb-path", "Bolt Database path ").Default("my.db").OverrideDefaultFromEnvar("BOLTDB_PATH").String()
 	tickerTime = kingpin.Flag("cc-pull-time", "CloudController Polling time in sec").Default("60s").OverrideDefaultFromEnvar("CF_PULL_TIME").Duration()
 )
@@ -51,7 +52,7 @@ var (
 const (
 	version = "0.0.1"
 )
-
+var logger = log.New(os.Stdout, "", 0)
 func main() {
 
 	banner.Print("usage nozzle")
@@ -68,8 +69,6 @@ func main() {
 
 	kingpin.Version(version)
 	kingpin.Parse()
-
-	logger := log.New(os.Stdout, "", 0)
 
 	logger.Println(fmt.Sprintf("Starting app-usage-nozzle %s ", version))
 
@@ -100,6 +99,40 @@ func main() {
 	caching.CreateBucket()
 
 	//Let's Update the database the first time
+	reloadApps()
+	lastReloaded := time.Now()
+	fmt.Println("Reloaded first time:", lastReloaded)
+
+	// Ticker Polling the CC every X sec
+	ccPolling := time.NewTicker(*tickerTime)
+
+	go func() {
+		for range ccPolling.C {
+			now :=time.Now()
+
+			//timeToReload := now.Add(-cloudControllerRefreshMin * time.Minute)
+			//todo figure out why this ^^^^ does not work
+			timeToReload := now.Add(-5 * time.Minute)
+			if timeToReload.After(lastReloaded) {
+				fmt.Println("Reloaded:", timeToReload)
+				reloadApps()
+				lastReloaded = now
+			}
+		}
+	}()
+
+	token, _ := cfClient.GetToken()
+
+	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, token, *subscriptionID, *skipSSLValidation)
+	if firehose != nil {
+		usageevents.ProcessEvents(firehose)
+		logger.Println("Firehose Subscription Succesfull! Routing events...")
+	} else {
+		logger.Fatal("Failed connecting to Firehose...Please check settings and try again!")
+	}
+}
+
+func reloadApps() {
 	logger.Println("Start filling app/space/org cache.")
 	apps := caching.GetAllApp()
 	for idx := range apps {
@@ -119,24 +152,4 @@ func main() {
 
 	logger.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))
 
-	// Ticker Polling the CC every X sec
-	ccPolling := time.NewTicker(*tickerTime)
-
-	go func() {
-		for range ccPolling.C {
-			logger.Println("Re-loading application cache.")
-			apps = caching.GetAllApp()
-			//todo call update uppdetails here for now
-		}
-	}()
-
-	token, _ := cfClient.GetToken()
-
-	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, token, *subscriptionID, *skipSSLValidation)
-	if firehose != nil {
-		usageevents.ProcessEvents(firehose)
-		logger.Println("Firehose Subscription Succesfull! Routing events...")
-	} else {
-		logger.Fatal("Failed connecting to Firehose...Please check settings and try again!")
-	}
 }

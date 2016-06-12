@@ -8,8 +8,9 @@ import (
 	//"time"
 	//"github.com/davecgh/go-spew/spew"
 	//"github.com/pivotalservices/app-usage-nozzle/usageevents"
-	"github.com/davecgh/go-spew/spew"
 	"app-usage-nozzle/domain"
+	"fmt"
+	"time"
 )
 
 
@@ -17,14 +18,10 @@ var AppDetails = make(map[string]domain.App)
 
 func TestReverse(t *testing.T) {
 
-	appKey := "bb7b3c89-0a7f-47f7-9dd3-5e4fbd8ded6c"
+	now := time.Now()
 
-	//app := usageevents.AppDetails[appKey]
-	//
+	fmt.Println("now:", now)
 
-	app := domain.App{GUID:appKey}
-
-	AnnotateWithCloudControllerData(&app)
-
-	spew.Dump(app)
+	then := now.Add(-10 * time.Minute)
+	fmt.Println("10 minutes ago:", then)
 }
