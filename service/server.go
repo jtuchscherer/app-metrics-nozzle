@@ -39,6 +39,7 @@ func NewServer() *negroni.Negroni {
 }
 
 func initRoutes(mx *mux.Router, formatter *render.Render) {
+	mx.HandleFunc("/api/apps/{org}/{space}/{app}/{instance_id}", appInstanceHandler(formatter)).Methods("GET")
 	mx.HandleFunc("/api/apps/{org}/{space}/{app}", appHandler(formatter)).Methods("GET")
 	mx.HandleFunc("/api/apps/{org}/{space}", appSpaceHandler(formatter)).Methods("GET")
 	mx.HandleFunc("/api/apps/{org}", appOrgHandler(formatter)).Methods("GET")
