@@ -56,6 +56,8 @@ var mutex sync.Mutex
 var logger = log.New(os.Stdout, "", 0)
 
 var AppDetails = make(map[string]domain.App)
+var Orgs []domain.Entity
+var Spaces []domain.Entity
 
 var feedStarted int64
 
@@ -165,7 +167,7 @@ func updateAppWithContainerMetrics(event Event) {
 	appDetail.EnvironmentSummary.TotalMemoryUsage = totalMemoryUsage
 
 	AppDetails[appKey] = appDetail
-	//logger.Println("Updated with Container metrics " + appKey)
+	logger.Println("Updated with Container metrics " + appKey)
 
 }
 
