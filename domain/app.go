@@ -1,14 +1,10 @@
 package domain
 
-//import "github.com/cloudfoundry-community/firehose-to-syslog/Godeps/_workspace/src/github.com/cloudfoundry/sonde-go/events"
-
-//import "github.com/pquerna/ffjson/shared"
-
-//http://json2struct.mervine.net/
 type InstanceCount  struct {
 	Configured int `json:"configured"`
 	Running    int `json:"running"`
 }
+
 
 type Instances struct {
 	CellIP        string `json:"cell_ip"`
@@ -17,7 +13,7 @@ type Instances struct {
 	GcStats       string `json:"gc_stats"`
 	InstanceIndex int64    `json:"index"`
 	MemoryUsage   uint64 `json:"memory_usage"` //MemBytes
-	Uptime        int32 `json:"uptime"`        //todo calculate
+	Uptime        int32 `json:"uptime"`
 	Since         int32 `json:"since"`
 	State         string `json:"state"`
 }
@@ -27,13 +23,13 @@ type App struct {
 
 	Environment           map[string]interface{} `json:"environment"`
 	EnvironmentSummary    struct {
-				      TotalCPU               float64 `json:"total_cpu"`          //todo calculate from instances add these from instances
+				      TotalCPU               float64 `json:"total_cpu"`
 				      TotalDiskConfigured   int32 `json:"total_disk_configured"`
 				      TotalDiskProvisioned   int32 `json:"total_disk_provisioned"`
-				      TotalDiskUsage         uint64 `json:"total_disk_usage"`   //todo calculate from instances add these from instances
+				      TotalDiskUsage         uint64 `json:"total_disk_usage"`
 				      TotalMemoryConfigured int32 `json:"total_memory_congigured"`
 				      TotalMemoryProvisioned int32 `json:"total_memory_provisioned"`
-				      TotalMemoryUsage       uint64 `json:"total_memory_usage"` //todo calculate from instances add these from instances
+				      TotalMemoryUsage       uint64 `json:"total_memory_usage"`
 			      } `json:"environment_summary"`
 	GUID                  string `json:"guid"`
 	InstanceCount          `json:"instance_count"`

@@ -100,6 +100,7 @@ func main() {
 
 	//Let's Update the database the first time
 	reloadApps()
+	reloadEvnDetails()
 	lastReloaded := time.Now()
 	fmt.Println("Reloaded first time:", lastReloaded)
 
@@ -116,6 +117,7 @@ func main() {
 			if timeToReload.After(lastReloaded) {
 				fmt.Println("Reloaded:", timeToReload)
 				reloadApps()
+				reloadEvnDetails()
 				lastReloaded = now
 			}
 		}
@@ -130,6 +132,11 @@ func main() {
 	} else {
 		logger.Fatal("Failed connecting to Firehose...Please check settings and try again!")
 	}
+}
+
+func reloadEvnDetails() {
+	usageevents.Orgs = api.OrgsDetailsFromCloudController()
+	usageevents.Spaces = api.SpacesDetailsFromCloudController()
 }
 
 func reloadApps() {

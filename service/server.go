@@ -44,4 +44,10 @@ func initRoutes(mx *mux.Router, formatter *render.Render) {
 	mx.HandleFunc("/api/apps/{org}/{space}", appSpaceHandler(formatter)).Methods("GET")
 	mx.HandleFunc("/api/apps/{org}", appOrgHandler(formatter)).Methods("GET")
 	mx.HandleFunc("/api/apps", appAllHandler(formatter)).Methods("GET")
+	mx.HandleFunc("/api/orgs/{org}", orgDetailsHandler(formatter)).Methods("GET")
+	mx.HandleFunc("/api/orgs", orgsHandler(formatter)).Methods("GET")
+	mx.HandleFunc("/api/spaces/{space}", spaceDetailsHandler(formatter)).Methods("GET")
+	mx.HandleFunc("/api/spaces", spaceHandler(formatter)).Methods("GET")
+
+
 }
