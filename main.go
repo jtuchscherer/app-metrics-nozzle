@@ -27,13 +27,14 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/cloudfoundry-community/firehose-to-syslog/firehose"
-	jgClient "github.com/jtgammon/go-cfclient"
+	jgClient "github.com/cloudfoundry-community/go-cfclient"
 
 	"app-usage-nozzle/service"
 	"app-usage-nozzle/usageevents"
 	"app-usage-nozzle/domain"
 	"app-usage-nozzle/api"
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
+	"github.com/cloudfoundry/noaa/consumer"
 )
 
 var (
@@ -125,7 +126,7 @@ func main() {
 
 	token, _ := cfClient.GetToken()
 
-	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, token, *subscriptionID, *skipSSLValidation)
+	firehose := firehose.CreateFirehoseChan(cfClient.Endpoint.DopplerEndpoint, token, *subscriptionID, *skipSSLValidation, consumer.KeepAlive)
 	if firehose != nil {
 		usageevents.ProcessEvents(firehose)
 		logger.Println("Firehose Subscription Succesfull! Routing events...")
