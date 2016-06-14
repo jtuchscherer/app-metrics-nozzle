@@ -170,7 +170,7 @@ func updateAppWithContainerMetrics(event Event) {
 	appDetail.EnvironmentSummary.TotalMemoryUsage = totalMemoryUsage
 
 	AppDetails[appKey] = appDetail
-	logger.Println("Updated with Container metrics " + appKey)
+	//logger.Println("Updated with Container metrics " + appKey)
 
 }
 
