@@ -16,7 +16,7 @@ limitations under the License.
 package api
 
 import (
-	cfclient "github.com/jtgammon/go-cfclient"
+	cfclient "github.com/cloudfoundry-community/go-cfclient"
 	"os"
 	"log"
 	"strconv"
