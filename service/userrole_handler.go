@@ -20,7 +20,7 @@ import (
 	"github.com/gorilla/mux"
 	"app-usage-nozzle/usageevents"
 	"github.com/unrolled/render"
-	"github.com/jtgammon/go-cfclient"
+	"github.com/cloudfoundry-community/go-cfclient"
 )
 
 func spacesUsersHandler(formatter *render.Render) http.HandlerFunc {
