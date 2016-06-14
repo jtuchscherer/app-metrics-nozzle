@@ -1,81 +1,81 @@
 hash: 2c636248e31a3f67897bdf71e67bafe25140641697b7d14e09e65c0521dca58b
-updated: 2016-06-07T17:13:37.241660411-04:00
+updated: 2016-06-14T14:08:15.666868859-04:00
 imports:
 - name: github.com/alecthomas/template
-  version: 14fd436dd20c3cc65242a9f396b61bfc8a3926fc
+  version: ""
   subpackages:
   - parse
 - name: github.com/alecthomas/units
-  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
+  version: ""
 - name: github.com/boltdb/bolt
-  version: 0fd4c0547d204c7b1cad6db6f3adad5f2cf453e5
+  version: ""
 - name: github.com/cloudfoundry-community/firehose-to-syslog
-  version: 489f825921fd4a1aa93295de7f9b32f0392ea502
+  version: ""
   subpackages:
   - caching
   - firehose
   - logging
+- name: github.com/cloudfoundry-community/go-cfclient
+  version: ""
 - name: github.com/cloudfoundry/noaa
-  version: 87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f
+  version: ""
   subpackages:
   - errors
 - name: github.com/cloudfoundry/sonde-go
-  version: d6ed492b509e180ee7675ed15237906041e53a6e
+  version: ""
   subpackages:
   - events
 - name: github.com/codegangsta/negroni
-  version: c7477ad8e330bef55bf1ebe300cf8aa67c492d1b
+  version: ""
 - name: github.com/CrowdSurge/banner
-  version: 8c0e79dc5ff70fb2919f0d662f44fd72ccdf9be2
+  version: ""
   subpackages:
   - fonts
-- name: github.com/davecgh/go-spew
-  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
-  subpackages:
-  - spew
 - name: github.com/gogo/protobuf
-  version: d5d4941acc4490628827091cafee2168f8c4bc67
+  version: ""
   subpackages:
   - gogoproto
   - proto
   - protoc-gen-gogo/descriptor
 - name: github.com/golang/protobuf
-  version: 3b06fc7a4cad73efce5fe6217ab6c33e7231ab4a
+  version: 8616e8ee5e20a1704615e6c8d7afcdac06087a67
   subpackages:
   - proto
 - name: github.com/gorilla/context
-  version: 1c83b3eabd45b6d76072b66b746c20815fb2872d
+  version: ""
 - name: github.com/gorilla/mux
-  version: 9c068cf16d982f8bd444b8c352acbeec34c4fe5b
+  version: ""
 - name: github.com/gorilla/websocket
-  version: 361d4c0ffd78338ebe0a9e6320cdbe115d7dc026
+  version: ""
+- name: github.com/jtgammon/go-cfclient
+  version: 76eef499d059bd1c4c124e26ea3ef5f96cce9649
 - name: github.com/pivotalservices/app-usage-nozzle
-  version: bcd1ef31c3aa983d70b0ae4f3caa91dd6773d5b9
+  version: 66cabaa2393bdacf5a465b4fdcdda6ff57614464
   subpackages:
   - service
   - usageevents
 - name: github.com/pquerna/ffjson
-  version: 03d5a0ae3a5a5d0cd8d2b593e247bb073c25dbcb
+  version: ""
   subpackages:
   - ffjson
   - fflib/v1
   - fflib/v1/internal
 - name: github.com/Sirupsen/logrus
-  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
+  version: ""
   subpackages:
   - hooks/syslog
 - name: github.com/unrolled/render
-  version: 40a2dfa24398d37b4a14938442a0f4fe4307b929
+  version: ""
 - name: golang.org/x/net
-  version: db8e4de5b2d6653f66aea53094624468caad15d2
+  version: ""
   subpackages:
   - context
 - name: golang.org/x/oauth2
-  version: ad0128250e8fba646a92ca9129716e523d63ef9f
+  version: ""
   subpackages:
   - internal
 - name: golang.org/x/sys
-  version: 9d4e42a20653790449273b3c85e67d6d8bae6e2e
+  version: ""
   subpackages:
   - unix
 - name: google.golang.org/appengine
@@ -88,5 +88,5 @@ imports:
   - internal/datastore
   - internal/remote_api
 - name: gopkg.in/alecthomas/kingpin.v2
-  version: 8cccfa8eb2e3183254457fb1749b2667fbc364c7
+  version: ""
 devImports: []
