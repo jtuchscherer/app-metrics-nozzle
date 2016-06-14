@@ -17,20 +17,22 @@ type Instances struct {
 	Since         int32 `json:"since"`
 	State         string `json:"state"`
 }
+
+type EnvironmentSummary struct {
+	TotalCPU               float64 `json:"total_cpu"`
+	TotalDiskConfigured   int32 `json:"total_disk_configured"`
+	TotalDiskProvisioned   int32 `json:"total_disk_provisioned"`
+	TotalDiskUsage         uint64 `json:"total_disk_usage"`
+	TotalMemoryConfigured int32 `json:"total_memory_congigured"`
+	TotalMemoryProvisioned int32 `json:"total_memory_provisioned"`
+	TotalMemoryUsage       uint64 `json:"total_memory_usage"`
+}
 type App struct {
 	Buildpack             string `json:"buildpack"`
 	Diego                 bool `json:"diego"`
 
 	Environment           map[string]interface{} `json:"environment"`
-	EnvironmentSummary    struct {
-				      TotalCPU               float64 `json:"total_cpu"`
-				      TotalDiskConfigured   int32 `json:"total_disk_configured"`
-				      TotalDiskProvisioned   int32 `json:"total_disk_provisioned"`
-				      TotalDiskUsage         uint64 `json:"total_disk_usage"`
-				      TotalMemoryConfigured int32 `json:"total_memory_congigured"`
-				      TotalMemoryProvisioned int32 `json:"total_memory_provisioned"`
-				      TotalMemoryUsage       uint64 `json:"total_memory_usage"`
-			      } `json:"environment_summary"`
+	EnvironmentSummary    *EnvironmentSummary `json:"environment_summary"`
 	GUID                  string `json:"guid"`
 	InstanceCount          `json:"instance_count"`
 	Instances             []Instances  `json:"instances"`
