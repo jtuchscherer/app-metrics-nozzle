@@ -25,6 +25,8 @@ import (
 	"strings"
 )
 
+
+
 func spaceDetailsHandler(formatter *render.Render) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", req.Header.Get("Origin"))

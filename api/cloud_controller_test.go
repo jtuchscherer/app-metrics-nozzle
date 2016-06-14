@@ -4,6 +4,8 @@ import (
 	"testing"
 	"app-usage-nozzle/domain"
 	"github.com/jtgammon/go-cfclient"
+	//"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"fmt"
 )
 
@@ -21,21 +23,28 @@ func TestReverse(t *testing.T) {
 
 	client, _ = cfclient.NewClient(&c)
 
-	orgs, _ := client.ListOrgs()
-	var o []domain.Entity // == nil
-	for idx := range orgs {
-		org := domain.Entity{Name:orgs[idx].Name, Guid:orgs[idx].Guid}
-		o = append(o, org)
-	}
-	logger.Println(fmt.Sprintf("Org name %s", o))
+	users, _ := client.UsersBySpace("c661e8c6-649a-4fe0-b471-afe5982e4e53")
+	logger.Println(fmt.Sprintf("Org name %s", users))
 
-	o = nil
-
-	spaces, _ := client.ListSpaces()
-	for idx := range spaces {
-		org := domain.Entity{Name:spaces[idx].Name, Guid:spaces[idx].Guid}
-		o = append(o, org)
+	for idx:= range users {
+		spew.Dump(users[idx])
 	}
-	logger.Println(fmt.Sprintf("Space name %s", o))
+
+	//orgs, _ := client.ListOrgs()
+	//var o []domain.Entity // == nil
+	//for idx := range orgs {
+	//	org := domain.Entity{Name:orgs[idx].Name, Guid:orgs[idx].Guid}
+	//	o = append(o, org)
+	//}
+	//logger.Println(fmt.Sprintf("Org name %s", o))
+	//
+	//o = nil
+	//
+	//spaces, _ := client.ListSpaces()
+	//for idx := range spaces {
+	//	org := domain.Entity{Name:spaces[idx].Name, Guid:spaces[idx].Guid}
+	//	o = append(o, org)
+	//}
+	//logger.Println(fmt.Sprintf("Space name %s", o))
 
 }

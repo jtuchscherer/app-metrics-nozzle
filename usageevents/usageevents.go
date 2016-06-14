@@ -27,6 +27,7 @@ import (
 	"app-usage-nozzle/domain"
 	"os"
 	"log"
+	"github.com/jtgammon/go-cfclient"
 )
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
@@ -56,8 +57,10 @@ var mutex sync.Mutex
 var logger = log.New(os.Stdout, "", 0)
 
 var AppDetails = make(map[string]domain.App)
-var Orgs []domain.Entity
-var Spaces []domain.Entity
+var OrganizationUsers = make(map[string][]cfclient.User)
+var SpacesUsers = make(map[string][]cfclient.User)
+var Orgs []cfclient.Org
+var Spaces []cfclient.Space
 
 var feedStarted int64
 

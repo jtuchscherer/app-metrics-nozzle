@@ -96,23 +96,23 @@ func AnnotateWithCloudControllerData(app *domain.App) {
 	app.State = ccAppDetails.State
 }
 
-func SpacesDetailsFromCloudController()  (Orgs []domain.Entity){
-	spacesDetails, _ := client.ListSpaces()
-	var spaces []domain.Entity // == nil
-	for idx := range spacesDetails {
-		org := domain.Entity{Name:spacesDetails[idx].Name, Guid:spacesDetails[idx].Guid}
-		spaces = append(spaces, org)
-	}
+func UsersForSpace(guid string) (Users []cfclient.User) {
+	users, _ := client.UsersBy(guid, "spaces")
+	return users
+}
+
+func UsersForOrganization(guid string) (Users []cfclient.User) {
+	users, _ := client.UsersBy(guid, "organizations")
+	return users
+}
+
+func SpacesDetailsFromCloudController()  (Spaces []cfclient.Space){
+	spaces, _ := client.ListSpaces()
 	return spaces
 }
 
-func OrgsDetailsFromCloudController()  (Orgs []domain.Entity){
-	orgsDetails, _ := client.ListOrgs()
-	var orgs []domain.Entity // == nil
-	for idx := range orgsDetails {
-		org := domain.Entity{Name:orgsDetails[idx].Name, Guid:orgsDetails[idx].Guid}
-		orgs = append(orgs, org)
-	}
+func OrgsDetailsFromCloudController()  (Orgs []cfclient.Org){
+	orgs, _ := client.ListOrgs()
 	return orgs
 }
 
