@@ -1,74 +1,22 @@
 package: app-usage-nozzle
 import:
 - package: github.com/CrowdSurge/banner
-  version: 8c0e79dc5ff70fb2919f0d662f44fd72ccdf9be2
-  subpackages:
-  - fonts
-- package: github.com/Sirupsen/logrus
-  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
-  subpackages:
-  - hooks/syslog
-- package: github.com/alecthomas/template
-  version: 14fd436dd20c3cc65242a9f396b61bfc8a3926fc
-  subpackages:
-  - parse
-- package: github.com/alecthomas/units
-  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
 - package: github.com/boltdb/bolt
-  version: 0fd4c0547d204c7b1cad6db6f3adad5f2cf453e5
 - package: github.com/cloudfoundry-community/firehose-to-syslog
-  version: 489f825921fd4a1aa93295de7f9b32f0392ea502
+  version: e02e12633a361ff25d241ed13666efa39407c890
+  repo: https://github.com/poprygun/firehose-to-syslog.git
+  vcs: git
   subpackages:
   - caching
   - firehose
-  - logging
-- package: github.com/cloudfoundry-community/go-cfclient
-  version: fa5067413ddd430b4c19f08a11bc93415ebb1672
-- package: github.com/cloudfoundry/noaa
-  version: 87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f
-  subpackages:
-  - errors
 - package: github.com/cloudfoundry/sonde-go
-  version: d6ed492b509e180ee7675ed15237906041e53a6e 
   subpackages:
   - events
 - package: github.com/codegangsta/negroni
-  version: c7477ad8e330bef55bf1ebe300cf8aa67c492d1b
-- package: github.com/gogo/protobuf
-  version: d5d4941acc4490628827091cafee2168f8c4bc67
-  subpackages:
-  - gogoproto
-  - proto
-  - protoc-gen-gogo/descriptor
-- package: github.com/gorilla/context
-  version: 1c83b3eabd45b6d76072b66b746c20815fb2872d
 - package: github.com/gorilla/mux
-  version: 9c068cf16d982f8bd444b8c352acbeec34c4fe5b
-- package: github.com/gorilla/websocket
-  version: 361d4c0ffd78338ebe0a9e6320cdbe115d7dc026
-- package: github.com/pquerna/ffjson
-  version: 03d5a0ae3a5a5d0cd8d2b593e247bb073c25dbcb
-  subpackages:
-  - ffjson
-  - fflib/v1
-  - fflib/v1/internal
+- package: github.com/cloudfoundry-community/go-cfclient
+  version: 76eef499d059bd1c4c124e26ea3ef5f96cce9649
+  repo: https://github.com/jtgammon/go-cfclient.git
+  vcs: git
 - package: github.com/unrolled/render
-  version: 40a2dfa24398d37b4a14938442a0f4fe4307b929
-- package: golang.org/x/net
-  version: db8e4de5b2d6653f66aea53094624468caad15d2
-  subpackages:
-  - context
-- package: golang.org/x/oauth2
-  version: ad0128250e8fba646a92ca9129716e523d63ef9f
-  subpackages:
-  - internal
-- package: golang.org/x/sys
-  version: 9d4e42a20653790449273b3c85e67d6d8bae6e2e
-  subpackages:
-  - unix
 - package: gopkg.in/alecthomas/kingpin.v2
-  version: 8cccfa8eb2e3183254457fb1749b2667fbc364c7
-- package: github.com/pivotalservices/app-usage-nozzle
-  subpackages:
-  - service
-  - usageevents

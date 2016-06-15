@@ -3,7 +3,7 @@ package api
 import (
 	"testing"
 	"app-usage-nozzle/domain"
-	"github.com/jtgammon/go-cfclient"
+	"github.com/cloudfoundry-community/go-cfclient"
 	//"fmt"
 	"github.com/davecgh/go-spew/spew"
 	"fmt"
