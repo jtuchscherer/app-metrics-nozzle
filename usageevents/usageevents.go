@@ -145,29 +145,31 @@ func updateAppWithContainerMetrics(event Event) {
 	appSpace := event.SpaceName
 
 	appKey := GetMapKeyFromAppData(appOrg, appSpace, appName)
+	appDetail := AppDetails[appKey]
 
 	var totalCPU float64 = 0
 	var totalDiskUsage uint64 = 0
 	var totalMemoryUsage uint64 = 0
 
-	if 0 < len(AppDetails[appKey].Instances) {
+	if 0 < len(appDetail.Instances) {
 
-		AppDetails[appKey].Instances[event.InstanceIndex].CellIP = event.CellIP
-		AppDetails[appKey].Instances[event.InstanceIndex].CPUUsage = event.CPUPercentage
-		AppDetails[appKey].Instances[event.InstanceIndex].MemoryUsage = event.MemBytes
-		AppDetails[appKey].Instances[event.InstanceIndex].DiskUsage = event.DiskBytes
+		appDetail.Instances[event.InstanceIndex].CellIP = event.CellIP
+		appDetail.Instances[event.InstanceIndex].CPUUsage = event.CPUPercentage
+		appDetail.Instances[event.InstanceIndex].MemoryUsage = event.MemBytes
+		appDetail.Instances[event.InstanceIndex].DiskUsage = event.DiskBytes
 
-		for i := 0; i < len(AppDetails[appKey].Instances); i++ {
+		for i := 0; i < len(appDetail.Instances); i++ {
 			totalCPU = totalCPU + event.CPUPercentage
 			totalDiskUsage = totalDiskUsage + event.DiskBytes
 			totalMemoryUsage = totalMemoryUsage + event.MemBytes
 		}
 	}
 
-	AppDetails[appKey].EnvironmentSummary.TotalCPU = totalCPU
-	AppDetails[appKey].EnvironmentSummary.TotalDiskUsage = totalDiskUsage
-	AppDetails[appKey].EnvironmentSummary.TotalMemoryUsage = totalMemoryUsage
+	appDetail.EnvironmentSummary.TotalCPU = totalCPU
+	appDetail.EnvironmentSummary.TotalDiskUsage = totalDiskUsage
+	appDetail.EnvironmentSummary.TotalMemoryUsage = totalMemoryUsage
 
+	AppDetails[appKey] = appDetail
 	//logger.Println("Updated with Container metrics " + appKey)
 }
 
