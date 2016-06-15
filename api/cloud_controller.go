@@ -80,8 +80,6 @@ func AnnotateWithCloudControllerData(app *domain.App) {
 	app.InstanceCount.Configured = len(instances)
 	app.InstanceCount.Running = runnintCount
 
-	app.EnvironmentSummary = new(domain.EnvironmentSummary)
-
 	app.EnvironmentSummary.TotalDiskConfigured = ccAppDetails.DiskQuota
 	app.EnvironmentSummary.TotalMemoryConfigured = ccAppDetails.MemQuota
 

@@ -32,7 +32,7 @@ type App struct {
 	Diego                 bool `json:"diego"`
 
 	Environment           map[string]interface{} `json:"environment"`
-	EnvironmentSummary    *EnvironmentSummary `json:"environment_summary"`
+	EnvironmentSummary    EnvironmentSummary `json:"environment_summary"`
 	GUID                  string `json:"guid"`
 	InstanceCount          `json:"instance_count"`
 	Instances             []Instances  `json:"instances"`
