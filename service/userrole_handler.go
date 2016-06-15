@@ -18,7 +18,7 @@ package service
 import (
 	"net/http"
 	"github.com/gorilla/mux"
-	"app-usage-nozzle/usageevents"
+	"app-metrics-nozzle/usageevents"
 	"github.com/unrolled/render"
 	"github.com/cloudfoundry-community/go-cfclient"
 )

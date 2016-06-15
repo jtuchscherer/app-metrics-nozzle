@@ -29,10 +29,10 @@ import (
 	"github.com/cloudfoundry-community/firehose-to-syslog/firehose"
 	goClient "github.com/cloudfoundry-community/go-cfclient"
 
-	"app-usage-nozzle/service"
-	"app-usage-nozzle/usageevents"
-	"app-usage-nozzle/domain"
-	"app-usage-nozzle/api"
+	"app-metrics-nozzle/service"
+	"app-metrics-nozzle/usageevents"
+	"app-metrics-nozzle/domain"
+	"app-metrics-nozzle/api"
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/cloudfoundry/noaa/consumer"
 )
@@ -57,7 +57,7 @@ var logger = log.New(os.Stdout, "", 0)
 
 func main() {
 
-	banner.Print("usage nozzle")
+	banner.Print("metrics usage nozzle")
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "3000"
@@ -72,7 +72,7 @@ func main() {
 	kingpin.Version(version)
 	kingpin.Parse()
 
-	logger.Println(fmt.Sprintf("Starting app-usage-nozzle %s ", version))
+	logger.Println(fmt.Sprintf("Starting app-metrics-nozzle %s ", version))
 
 	c := goClient.Config{
 		ApiAddress:        *apiEndpoint,

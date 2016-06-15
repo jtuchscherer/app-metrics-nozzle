@@ -79,7 +79,7 @@ To install this application, it should be run as an app within Cloud Foundry. So
 cf push app-usage-nozzle --no-start
 ```
 
-The `no-start` is important because we have not yet defined the environment variables that allow the application to connect to the Firehose and begin monitoring router requests. We want to end up with a set of environment variables that looks like this when we issue a `cf env app-usage-nozzle` command:
+The `no-start` is important because we have not yet defined the environment variables that allow the application to connect to the Firehose and begin monitoring router requests. We want to end up with a set of environment variables that looks like this when we issue a `cf env app-metrics-nozzle` command:
 
 ```
 User-Provided:
