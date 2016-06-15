@@ -21,7 +21,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"app-usage-nozzle/domain"
+	"app-metrics-nozzle/domain"
 )
 
 var logger = log.New(os.Stdout, "", 0)
