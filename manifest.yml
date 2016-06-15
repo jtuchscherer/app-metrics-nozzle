@@ -2,13 +2,13 @@ applications:
 - path: .
   memory: 1024MB
   instances: 1
-  name: app-usage-nozzle-alex
+  name: app-metrics-nozzle-alex
   disk_quota: 1024M
-  command: app-usage-nozzle
+  command: app-metrics-nozzle
   buildpack: https://github.com/cloudfoundry/go-buildpack.git
 env:
   GOVERSION: go1.6
-  GOPACKAGENAME: app-usage-nozzle
+  GOPACKAGENAME: app-metrics-nozzle
   API_ENDPOINT: https://api.run.haas-41.pez.pivotal.io
   FIREHOSE_USER: admin
   FIREHOSE_PASSWORD: ***REMOVED***

@@ -1,4 +1,4 @@
-package: app-usage-nozzle
+package: app-metrics-nozzle
 import:
 - package: github.com/CrowdSurge/banner
 - package: github.com/boltdb/bolt
