@@ -27,7 +27,7 @@ import (
 	"app-usage-nozzle/domain"
 	"os"
 	"log"
-	"github.com/jtgammon/go-cfclient"
+	"github.com/cloudfoundry-community/go-cfclient"
 )
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
@@ -65,7 +65,7 @@ var Spaces []cfclient.Space
 var feedStarted int64
 
 // ProcessEvents churns through the firehose channel, processing incoming events.
-func ProcessEvents(in chan *events.Envelope) {
+func ProcessEvents(in <-chan *events.Envelope) {
 	feedStarted = time.Now().UnixNano()
 	for msg := range in {
 		processEvent(msg)
@@ -171,7 +171,6 @@ func updateAppWithContainerMetrics(event Event) {
 
 	AppDetails[appKey] = appDetail
 	//logger.Println("Updated with Container metrics " + appKey)
-
 }
 
 func updateAppDetails(event Event) {
