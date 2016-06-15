@@ -45,7 +45,6 @@ var (
 	user = kingpin.Flag("user", "Admin user.").Default("admin").OverrideDefaultFromEnvar("FIREHOSE_USER").String()
 	password = kingpin.Flag("password", "Admin password.").Default("admin").OverrideDefaultFromEnvar("FIREHOSE_PASSWORD").String()
 	skipSSLValidation = kingpin.Flag("skip-ssl-validation", "Please don't").Default("false").OverrideDefaultFromEnvar("SKIP_SSL_VALIDATION").Bool()
-	cloudControllerRefreshMin = kingpin.Flag("cloud-control-refresh-min", "Cloud Controller API call interval in minutes").OverrideDefaultFromEnvar("CLOUD_CONTROLLER_REFRESH_MIN").Int()
 	boltDatabasePath = kingpin.Flag("boltdb-path", "Bolt Database path ").Default("my.db").OverrideDefaultFromEnvar("BOLTDB_PATH").String()
 	tickerTime = kingpin.Flag("cc-pull-time", "CloudController Polling time in sec").Default("60s").OverrideDefaultFromEnvar("CF_PULL_TIME").Duration()
 )
@@ -53,7 +52,9 @@ var (
 const (
 	version = "0.0.1"
 )
+
 var logger = log.New(os.Stdout, "", 0)
+
 func main() {
 
 	banner.Print("usage nozzle")
@@ -110,17 +111,10 @@ func main() {
 
 	go func() {
 		for range ccPolling.C {
-			now :=time.Now()
-
-			//timeToReload := now.Add(-cloudControllerRefreshMin * time.Minute)
-			//todo figure out why this ^^^^ does not work
-			timeToReload := now.Add(-5 * time.Minute)
-			if timeToReload.After(lastReloaded) {
-				fmt.Println("Reloaded:", timeToReload)
-				reloadApps()
-				reloadEnvDetails()
-				lastReloaded = now
-			}
+			now := time.Now()
+			logger.Print(" ---> " + now.Format(time.RFC3339))
+			reloadApps()
+			reloadEnvDetails()
 		}
 	}()
 
@@ -138,14 +132,14 @@ func main() {
 func reloadEnvDetails() {
 	usageevents.Orgs = api.OrgsDetailsFromCloudController()
 
-	for idx := range usageevents.Orgs{
+	for idx := range usageevents.Orgs {
 		users := api.UsersForOrganization(usageevents.Orgs[idx].Guid)
 		usageevents.OrganizationUsers[usageevents.Orgs[idx].Name] = users
 	}
 
 	usageevents.Spaces = api.SpacesDetailsFromCloudController()
 
-	for idx := range usageevents.Spaces{
+	for idx := range usageevents.Spaces {
 		users := api.UsersForSpace(usageevents.Spaces[idx].Guid)
 		usageevents.SpacesUsers[usageevents.Spaces[idx].Name] = users
 	}
