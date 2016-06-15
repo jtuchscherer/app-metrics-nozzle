@@ -24,7 +24,7 @@ import (
 	"github.com/cloudfoundry/sonde-go/events"
 	"strings"
 	"strconv"
-	"app-usage-nozzle/domain"
+	"app-metrics-nozzle/domain"
 	"os"
 	"log"
 	"github.com/cloudfoundry-community/go-cfclient"

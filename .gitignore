@@ -23,7 +23,6 @@ _testmain.go
 *.test
 *.prof
 .idea
-app-usage-nozzle.iml
-app-usage-nozzle
+*.iml
 run.sh
 my.db
