@@ -27,7 +27,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/cloudfoundry-community/firehose-to-syslog/firehose"
-	jgClient "github.com/cloudfoundry-community/go-cfclient"
+	goClient "github.com/cloudfoundry-community/go-cfclient"
 
 	"app-usage-nozzle/service"
 	"app-usage-nozzle/usageevents"
@@ -74,13 +74,13 @@ func main() {
 
 	logger.Println(fmt.Sprintf("Starting app-usage-nozzle %s ", version))
 
-	c := jgClient.Config{
+	c := goClient.Config{
 		ApiAddress:        *apiEndpoint,
 		Username:          *user,
 		Password:          *password,
 		SkipSslValidation: *skipSSLValidation,
 	}
-	cfClient, _ := jgClient.NewClient(&c)
+	cfClient, _ := goClient.NewClient(&c)
 
 	if len(*dopplerEndpoint) > 0 {
 		cfClient.Endpoint.DopplerEndpoint = *dopplerEndpoint
