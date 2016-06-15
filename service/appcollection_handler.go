@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/gorilla/mux"
-	"app-usage-nozzle/usageevents"
+	"app-metrics-nozzle/usageevents"
 	"github.com/unrolled/render"
 	"strings"
-	"app-usage-nozzle/domain"
+	"app-metrics-nozzle/domain"
 	"strconv"
 )
 
