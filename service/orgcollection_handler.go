@@ -18,7 +18,7 @@ package service
 
 import (
 	"net/http"
-	"app-usage-nozzle/usageevents"
+	"app-metrics-nozzle/usageevents"
 	"github.com/unrolled/render"
 
 	"github.com/gorilla/mux"
