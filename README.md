@@ -33,11 +33,11 @@ This is a sample of what the JSON response looks like for the app `/api/apps`:
   "environment": {},
   "environment_summary": {
     "total_cpu": 0.19134577882529913,
-    "total_disk_configured": 1024,
-    "total_disk_provisioned": 1024,
+    "total_disk_configured": 1073741824,
+    "total_disk_provisioned": 1073741824,
     "total_disk_usage": 162381824,
-    "total_memory_configured": 1024,
-    "total_memory_provisioned": 1024,
+    "total_memory_configured": 1073741824,
+    "total_memory_provisioned": 1073741824,
     "total_memory_usage": 744574976
   },
   "guid": "bb7b3c89-0a7f-47f7-9dd3-5e4fbd8ded6c",
