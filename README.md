@@ -13,14 +13,14 @@ This application exposes a RESTful API that allows consumers to query applicatio
 | `/api/apps/[org]/[space]/[app]/[instance_id]` | GET | Obtains information for the instance of the application including IP, CPI usage and Memory usage. |
 | `/api/apps/[org]/[space]` | GET | Obtains application details deployed in specified space. |
 | `/api/apps/[org]` | GET | Obtains application details deployed in specified organization. |
+| `/api/orgs` | GET | Obtains names and guids of all organizations. |
 | `/api/orgs/[org]` | GET | Obtains name and guid of an organization. |
-| `/api/org` | GET | Obtains names and guids of all organizations. |
 | `/api/orgs/[org]/users` | GET | Returns information about users of specified organization. |
 | `/api/orgs/[org]/[role]/users` | GET | Returns users of specified organization by role. |
+| `/api/spaces` | GET | Returns a list of spaces. |
 | `/api/spaces/[space]` | GET | Returns space details. |
 | `/api/spaces/[space]/users` | GET | Returns users of specified space. |
 | `/api/spaces/[space]/[role]/users` | GET | Returns users of specified space by role. |
-| `/api/spaces` | GET | Returns a list of spaces. |
 
 ### JSON Payloads
 This is a sample of what the JSON response looks like for the app `/api/apps`:
@@ -33,11 +33,11 @@ This is a sample of what the JSON response looks like for the app `/api/apps`:
   "environment": {},
   "environment_summary": {
     "total_cpu": 0.19134577882529913,
-    "total_disk_configured": 1024,
-    "total_disk_provisioned": 1024,
+    "total_disk_configured": 1073741824,
+    "total_disk_provisioned": 1073741824,
     "total_disk_usage": 162381824,
-    "total_memory_congigured": 1024,
-    "total_memory_provisioned": 1024,
+    "total_memory_configured": 1073741824,
+    "total_memory_provisioned": 1073741824,
     "total_memory_usage": 744574976
   },
   "guid": "bb7b3c89-0a7f-47f7-9dd3-5e4fbd8ded6c",
@@ -74,8 +74,7 @@ This is a sample of what the JSON response looks like for the app `/api/apps`:
     "id": "dc4d1d1f-f4b9-4c60-8cbb-5763491d00c1",
     "name": "ashumilov"
   },
-  "state": "STARTED",
-  "system_number": ""
+  "state": "STARTED"
 }
 ,
 "org/space/app" : {},

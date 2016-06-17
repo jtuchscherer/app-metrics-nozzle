@@ -23,7 +23,7 @@ type EnvironmentSummary struct {
 	TotalDiskConfigured   int32 `json:"total_disk_configured"`
 	TotalDiskProvisioned   int32 `json:"total_disk_provisioned"`
 	TotalDiskUsage         uint64 `json:"total_disk_usage"`
-	TotalMemoryConfigured int32 `json:"total_memory_congigured"`
+	TotalMemoryConfigured int32 `json:"total_memory_configured"`
 	TotalMemoryProvisioned int32 `json:"total_memory_provisioned"`
 	TotalMemoryUsage       uint64 `json:"total_memory_usage"`
 }
@@ -51,7 +51,6 @@ type App struct {
 				      Name string `json:"name"`
 			      } `json:"space"`
 	State                 string `json:"state"`
-	SystemNumber          string `json:"system_number"`
 }
 
 
