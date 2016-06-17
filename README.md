@@ -36,7 +36,7 @@ This is a sample of what the JSON response looks like for the app `/api/apps`:
     "total_disk_configured": 1024,
     "total_disk_provisioned": 1024,
     "total_disk_usage": 162381824,
-    "total_memory_congigured": 1024,
+    "total_memory_configured": 1024,
     "total_memory_provisioned": 1024,
     "total_memory_usage": 744574976
   },
@@ -74,8 +74,7 @@ This is a sample of what the JSON response looks like for the app `/api/apps`:
     "id": "dc4d1d1f-f4b9-4c60-8cbb-5763491d00c1",
     "name": "ashumilov"
   },
-  "state": "STARTED",
-  "system_number": ""
+  "state": "STARTED"
 }
 ,
 "org/space/app" : {},
