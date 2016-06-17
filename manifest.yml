@@ -2,7 +2,7 @@ applications:
 - path: .
   memory: 1024MB
   instances: 1
-  name: app-metrics-nozzle
+  name: app-metrics-nozzle-alex-2
   disk_quota: 1024M
   command: app-metrics-nozzle
   buildpack: https://github.com/cloudfoundry/go-buildpack.git
@@ -10,7 +10,7 @@ env:
   GOVERSION: go1.6
   GOPACKAGENAME: app-metrics-nozzle
   API_ENDPOINT: https://api.run.haas-41.pez.pivotal.io
-  FIREHOSE_USER: (this is a secret)
-  FIREHOSE_PASSWORD: (this is a secret)
+  FIREHOSE_USER: admin
+  FIREHOSE_PASSWORD: cb0a40f8d6360eaed442
   SKIP_SSL_VALIDATION: true
   CF_PULL_TIME: 300s

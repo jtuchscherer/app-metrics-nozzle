@@ -25,32 +25,49 @@ import (
 )
 
 var logger = log.New(os.Stdout, "", 0)
-var client *cfclient.Client
+var Client CFClientCaller
 
-func init(){
+type CFClientCaller interface {
+	AppByGuid(guid string) (cfclient.App, error)
+	GetAppInstances(guid string) (map[string]cfclient.AppInstance, error)
+	UsersBy(guid string, entity string) ([]cfclient.User, error)
+	ListSpaces() ([]cfclient.Space, error)
+	ListOrgs() ([]cfclient.Org, error)
+	ListApps() ([]cfclient.App, error)
+	AppSpace(app cfclient.App) (cfclient.Space, error)
+	SpaceOrg(space cfclient.Space) (cfclient.Org, error)
+}
 
-	skipSsl, _ := strconv.ParseBool(os.Getenv("SKIP_SSL_VALIDATION"))
-	c := cfclient.Config{
-		ApiAddress:        os.Getenv("API_ENDPOINT"),
-		Username:          os.Getenv("FIREHOSE_USER"),
-		Password:          os.Getenv("FIREHOSE_PASSWORD"),
-		SkipSslValidation: skipSsl,
-	}
+func AppByGuidVerify(guid string) (cfclient.App) {
+	app, _ := Client.AppByGuid(guid)
+	return app
+}
 
-	logger.Println("Processing Cloud Controller call to " + os.Getenv("API_ENDPOINT"))
-	client, _ = cfclient.NewClient(&c)
+func AppInstancesByGuidVerify(guid string) (map[string]cfclient.AppInstance) {
+	app, _ := Client.GetAppInstances(guid)
+	return app
+}
+
+func UsersByOrgVerify(guid string) ([]cfclient.User) {
+	app, _ := Client.UsersBy(guid, "organizations")
+	return app
+}
+
+func UsersBySpaceVerify(guid string) ([]cfclient.User) {
+	app, _ := Client.UsersBy(guid, "spaces")
+	return app
 }
 
 func AnnotateWithCloudControllerData(app *domain.App) {
 
-	ccAppDetails, _ := client.AppByGuid(app.GUID)
+	ccAppDetails, _ := Client.AppByGuid(app.GUID)
 
-	instances, _ := client.GetAppInstances(app.GUID)
+	instances, _ := Client.GetAppInstances(app.GUID)
 	runnintCount := 0
 	instanceUp := "RUNNING"
 
-	space, _ := ccAppDetails.Space()
-	org, _ := space.Org()
+	space, _ := Client.AppSpace(ccAppDetails)
+	org, _ := Client.SpaceOrg(space)
 
 	app.Diego = ccAppDetails.Diego
 	app.Buildpack = ccAppDetails.Buildpack
@@ -67,7 +84,9 @@ func AnnotateWithCloudControllerData(app *domain.App) {
 		app.Instances[i].Uptime = eachInstance.Uptime
 	}
 
-	if len(app.Buildpack) == 0 { app.Buildpack = ccAppDetails.DetectedBP }
+	if len(app.Buildpack) == 0 {
+		app.Buildpack = ccAppDetails.DetectedBP
+	}
 
 	app.Environment = ccAppDetails.Environment
 
@@ -97,22 +116,22 @@ func AnnotateWithCloudControllerData(app *domain.App) {
 }
 
 func UsersForSpace(guid string) (Users []cfclient.User) {
-	users, _ := client.UsersBy(guid, "spaces")
+	users, _ := Client.UsersBy(guid, "spaces")
 	return users
 }
 
 func UsersForOrganization(guid string) (Users []cfclient.User) {
-	users, _ := client.UsersBy(guid, "organizations")
+	users, _ := Client.UsersBy(guid, "organizations")
 	return users
 }
 
-func SpacesDetailsFromCloudController()  (Spaces []cfclient.Space){
-	spaces, _ := client.ListSpaces()
+func SpacesDetailsFromCloudController() (Spaces []cfclient.Space) {
+	spaces, _ := Client.ListSpaces()
 	return spaces
 }
 
-func OrgsDetailsFromCloudController()  (Orgs []cfclient.Org){
-	orgs, _ := client.ListOrgs()
+func OrgsDetailsFromCloudController() (Orgs []cfclient.Org) {
+	orgs, _ := Client.ListOrgs()
 	return orgs
 }
 
