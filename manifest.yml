@@ -10,7 +10,7 @@ env:
   GOVERSION: go1.6
   GOPACKAGENAME: app-metrics-nozzle
   API_ENDPOINT: https://api.run.haas-41.pez.pivotal.io
-  FIREHOSE_USER: admin
-  FIREHOSE_PASSWORD: ***REMOVED***
+  FIREHOSE_USER: [secret]
+  FIREHOSE_PASSWORD: [secret]
   SKIP_SSL_VALIDATION: true
   CF_PULL_TIME: 300s
