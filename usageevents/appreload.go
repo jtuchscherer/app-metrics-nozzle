@@ -7,11 +7,6 @@ import (
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 )
 
-type AppCaching interface {
-	GetAllApp() []caching.App
-	GetAppInfo(appGuid string) caching.App
-}
-
 func ReloadApps(cachedApps []caching.App) {
 	logger.Println("Start filling app/space/org cache.")
 	for idx := range cachedApps {
