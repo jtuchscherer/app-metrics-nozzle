@@ -99,11 +99,11 @@ func AnnotateWithCloudControllerData(app *domain.App) {
 	app.InstanceCount.Configured = len(instances)
 	app.InstanceCount.Running = runnintCount
 
-	app.EnvironmentSummary.TotalDiskConfigured = ccAppDetails.DiskQuota
-	app.EnvironmentSummary.TotalMemoryConfigured = ccAppDetails.MemQuota
+	app.EnvironmentSummary.TotalDiskConfigured = ccAppDetails.DiskQuota * 1024 * 1024
+	app.EnvironmentSummary.TotalMemoryConfigured = ccAppDetails.MemQuota * 1024 * 1024
 
-	app.EnvironmentSummary.TotalDiskProvisioned = ccAppDetails.DiskQuota * int32(len(instances))
-	app.EnvironmentSummary.TotalMemoryProvisioned = ccAppDetails.MemQuota * int32(len(instances))
+	app.EnvironmentSummary.TotalDiskProvisioned = ccAppDetails.DiskQuota * 1024 * 1024 * int32(len(instances))
+	app.EnvironmentSummary.TotalMemoryProvisioned = ccAppDetails.MemQuota * 1024 * 1024 * int32(len(instances))
 
 	if 0 < len(ccAppDetails.RouteData) {
 		app.Routes = make([]string, len(ccAppDetails.RouteData))
