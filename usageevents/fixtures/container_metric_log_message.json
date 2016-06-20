@@ -1,0 +1,1 @@
+{"origin":"rep","eventType":9,"timestamp":1466425835662229606,"deployment":"cf","job":"diego_cell-partition-b219a2cab4a7c259e76c","index":"0","ip":"10.65.201.53","containerMetric":{"applicationId":"32315c78-7a36-41f6-a3bf-d72fe40865b7","instanceIndex":5,"cpuPercentage":0.024462500173323656,"memoryBytes":8134656,"diskBytes":9920512}}

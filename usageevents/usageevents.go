@@ -61,18 +61,23 @@ var OrganizationUsers = make(map[string][]cfclient.User)
 var SpacesUsers = make(map[string][]cfclient.User)
 var Orgs []cfclient.Org
 var Spaces []cfclient.Space
+var AppDbCache CachedApp
 
 var feedStarted int64
+
+func init() {
+	AppDbCache = new(AppCache)
+}
 
 // ProcessEvents churns through the firehose channel, processing incoming events.
 func ProcessEvents(in <-chan *events.Envelope) {
 	feedStarted = time.Now().UnixNano()
 	for msg := range in {
-		processEvent(msg)
+		ProcessEvent(msg)
 	}
 }
 
-func processEvent(msg *events.Envelope) {
+func ProcessEvent(msg *events.Envelope) {
 	eventType := msg.GetEventType()
 
 	var event Event
@@ -197,19 +202,21 @@ func updateAppDetails(event Event) {
 	elapsedSeconds := totalElapsed / 1000000000
 	appDetail.RequestsPerSecond = float64(appDetail.EventCount) / float64(elapsedSeconds)
 	appDetail.ElapsedSinceLastEvent = eventElapsed / 1000000000
-
 	AppDetails[appKey] = appDetail
+	//spew.Dump(AppDetails[appKey])
+
 	//logger.Println("Updated with App Details " + appKey)
 
 }
 
 func getAppInfo(appGUID string) caching.App {
-	if app := caching.GetAppInfo(appGUID); app.Name != "" {
+	if app := AppDbCache.GetAppInfo(appGUID); app.Name != "" {
 		return app
 	}
-	caching.GetAppByGuid(appGUID)
 
-	return caching.GetAppInfo(appGUID)
+	AppDbCache.GetAppByGuid(appGUID)
+
+	return AppDbCache.GetAppInfo(appGUID)
 }
 
 // LogMessage augments a raw message Envelope with log message metadata.
