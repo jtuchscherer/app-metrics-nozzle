@@ -1,5 +1,17 @@
 box: golang
 
+dev:
+  steps:
+    - script:
+        name: debug 1
+        code: |
+          echo "debug one"
+
+    - script:
+        name: debug 2
+        code: |
+          echo "debug two"
+
 build:
   steps:
     - wercker/setup-go-workspace:
@@ -32,18 +44,6 @@ build:
 
 deploy:
   steps:
-    - script:
-        name: go get2
-        code: |
-          cd $WERCKER_SOURCE_DIR
-          go version
-          go get github.com/Masterminds/glide
-          go get github.com/onsi/ginkgo/ginkgo
-          go get github.com/onsi/gomega
-          export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
-          glide --version
-          glide install
-
     - xchapter7x/cf-push-zdd:
         num_instances: 1
         user_name: $cfuser
