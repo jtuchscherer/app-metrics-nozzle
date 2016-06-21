@@ -45,4 +45,3 @@ deploy:
         api_url: $cfurl
         app_name: $cfappname
         use_manifest: true
-        manifest: manifest.yml

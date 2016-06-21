@@ -2,7 +2,7 @@ applications:
 - path: .
   memory: 1024MB
   instances: 1
-  name: app-metrics-nozzle
+  name: app-metrics-nozzle-2
   disk_quota: 1024M
   command: app-metrics-nozzle
   buildpack: https://github.com/cloudfoundry/go-buildpack.git
