@@ -1,0 +1,42 @@
+box: golang
+
+build:
+  steps:
+    - wercker/setup-go-workspace:
+        package-dir: app-metrics-nozzle
+
+    # Gets the dependencies
+    - script:
+        name: go get
+        code: |
+          cd $WERCKER_SOURCE_DIR
+          go version
+          go get github.com/Masterminds/glide
+          go get github.com/onsi/ginkgo/ginkgo
+          go get github.com/onsi/gomega
+          export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+          glide --version
+          glide install
+
+    # Build the project
+    - script:
+        name: go build
+        code: |
+          go build
+
+    # Test the project
+    - script:
+        name: go test
+        code: |
+          go test $(glide novendor) -v -cover
+
+deploy:
+  steps:
+    - xchapter7x/cf-push:
+        cloudfoundry_user_name: $cfuser
+        cloudfoundry_user_pass: $cfpass
+        cloudfoundry_org: $cforg
+        cloudfoundry_space: $cfspace
+        cloudfoundry_api_url: $cfurl
+        cloudfoundry_app_name: $cfappname
+        cloudfoundry_use_manifest: true
