@@ -33,7 +33,7 @@ build:
 deploy:
   steps:
       - script:
-          name: go get
+          name: go get2
           code: |
             cd $WERCKER_SOURCE_DIR
             go version
@@ -45,7 +45,7 @@ deploy:
         name: debug
         code: |
           ls -la
-          
+
     - xchapter7x/cf-push-zdd:
         num_instances: 1
         user_name: $cfuser
