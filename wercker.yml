@@ -18,6 +18,11 @@ build:
           glide --version
           glide install
 
+    - script:
+        name: debug
+        code: |
+          ls -la
+
     # Build the project
     - script:
         name: go build
@@ -32,6 +37,20 @@ build:
 
 deploy:
   steps:
+
+     # Gets the dependencies for deploy
+     - script:
+         name: go get for deploy
+         code: |
+           cd $WERCKER_SOURCE_DIR
+           go version
+           go get github.com/Masterminds/glide
+           go get github.com/onsi/ginkgo/ginkgo
+           go get github.com/onsi/gomega
+           export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+           glide --version
+           glide install
+
     - script:
         name: debug
         code: |
