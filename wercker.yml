@@ -53,4 +53,4 @@ deploy:
         api_url: $cfurl
         app_name: $cfappname
         use_manifest: true
-        cloudfoundry_no_start: true
+        no_start: true
