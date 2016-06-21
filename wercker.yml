@@ -40,10 +40,12 @@ deploy:
             export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
             glide --version
             glide install
+
     - script:
         name: debug
         code: |
           ls -la
+          
     - xchapter7x/cf-push-zdd:
         num_instances: 1
         user_name: $cfuser
