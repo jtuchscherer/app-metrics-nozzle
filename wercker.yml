@@ -44,11 +44,6 @@ deploy:
           glide --version
           glide install
 
-    - script:
-        name: debug
-        code: |
-          ls -la
-
     - xchapter7x/cf-push-zdd:
         num_instances: 1
         user_name: $cfuser
@@ -58,3 +53,4 @@ deploy:
         api_url: $cfurl
         app_name: $cfappname
         use_manifest: true
+        cloudfoundry_no_start: true
