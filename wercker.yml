@@ -1,17 +1,5 @@
 box: golang
 
-dev:
-  steps:
-    - script:
-        name: debug 1
-        code: |
-          echo "debug one"
-
-    - script:
-        name: debug 2
-        code: |
-          echo "debug two"
-
 build:
   steps:
     - wercker/setup-go-workspace:
