@@ -32,11 +32,13 @@ build:
 
 deploy:
   steps:
-    - xchapter7x/cf-push:
-        cloudfoundry_user_name: $cfuser
-        cloudfoundry_user_pass: $cfpass
-        cloudfoundry_org: $cforg
-        cloudfoundry_space: $cfspace
-        cloudfoundry_api_url: $cfurl
-        cloudfoundry_app_name: $cfappname
-        cloudfoundry_use_manifest: true
+    - xchapter7x/cf-push-zdd:
+        num_instances: 1
+        user_name: $cfuser
+        user_pass: $cfpass
+        org: $cforg
+        space: $cfspace
+        api_url: $cfurl
+        app_name: $cfappname
+        use_manifest: true
+        manifest: manifest.yml
