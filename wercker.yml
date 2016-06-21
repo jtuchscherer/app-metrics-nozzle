@@ -37,7 +37,6 @@ build:
 
 deploy:
   steps:
-
      # Gets the dependencies for deploy
      - script:
          name: go get for deploy
