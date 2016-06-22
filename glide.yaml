@@ -15,7 +15,7 @@ import:
 - package: github.com/codegangsta/negroni
 - package: github.com/gorilla/mux
 - package: github.com/cloudfoundry-community/go-cfclient
-  version: 76eef499d059bd1c4c124e26ea3ef5f96cce9649
+  version: 96e98d520e516cfa2edc38e924ab41b36b0120a3
   repo: https://github.com/jtgammon/go-cfclient.git
   vcs: git
 - package: github.com/unrolled/render

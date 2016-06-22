@@ -31,7 +31,6 @@ import (
 
 	"app-metrics-nozzle/service"
 	"app-metrics-nozzle/usageevents"
-	"app-metrics-nozzle/domain"
 	"app-metrics-nozzle/api"
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/cloudfoundry/noaa/consumer"
@@ -94,14 +93,17 @@ func main() {
 		os.Exit(1)
 
 	}
+
 	defer db.Close()
 
 	caching.SetCfClient(cfClient)
 	caching.SetAppDb(db)
 	caching.CreateBucket()
 
+	api.Client = cfClient
+
 	//Let's Update the database the first time
-	reloadApps()
+	usageevents.ReloadApps(caching.GetAllApp())
 	reloadEnvDetails()
 	lastReloaded := time.Now()
 	fmt.Println("Reloaded first time:", lastReloaded)
@@ -113,7 +115,7 @@ func main() {
 		for range ccPolling.C {
 			now := time.Now()
 			logger.Print(" ---> " + now.Format(time.RFC3339))
-			reloadApps()
+			usageevents.ReloadApps(caching.GetAllApp())
 			reloadEnvDetails()
 		}
 	}()
@@ -145,24 +147,4 @@ func reloadEnvDetails() {
 	}
 }
 
-func reloadApps() {
-	logger.Println("Start filling app/space/org cache.")
-	apps := caching.GetAllApp()
-	for idx := range apps {
-		org := apps[idx].OrgName
-		space := apps[idx].SpaceName
-		app := apps[idx].Name
-		key := usageevents.GetMapKeyFromAppData(org, space, app)
 
-		appId := apps[idx].Guid
-		name := apps[idx].Name
-
-		appDetail := domain.App{GUID:appId, Name:name}
-		api.AnnotateWithCloudControllerData(&appDetail)
-		usageevents.AppDetails[key] = appDetail
-		logger.Println(fmt.Sprintf("Registered [%s]", key))
-	}
-
-	logger.Println(fmt.Sprintf("Done filling cache! Found [%d] Apps", len(apps)))
-
-}
