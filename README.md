@@ -94,7 +94,8 @@ The `no-start` is important because we have not yet defined the environment vari
 
 ```
 User-Provided:
-API_ENDPOINT: https://api.run.pez.pivotal.io
+API_ENDPOINT: https://api.local.pcfdev.io
+DOPPLER_ENDPOINT: wss://doppler.local.pcfdev.io:443
 CF_PULL_TIME: 9999s
 FIREHOSE_PASSWORD: (this is a secret)
 FIREHOSE_SUBSCRIPTION_ID: app-metrics-nozzle
@@ -102,3 +103,9 @@ FIREHOSE_USER: (this is also secret)
 SKIP_SSL_VALIDATION: true
 ```
 Once you've set these environment variables with `cf set-env (app) (var) (value)` you can just start the application usage nozzle via `cf start`. Make sure the application has come up by hitting the API endpoint. Depending on how large of a foundation in which it was deployed, it can take _several minutes_ for the cache of application metadata to fill up.
+
+DOPPLER_ENDPOINT can be obtained by running
+```bash
+cf curl /v2/info
+```
+
