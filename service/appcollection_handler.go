@@ -19,12 +19,13 @@ package service
 import (
 	"fmt"
 	"net/http"
-	"github.com/gorilla/mux"
-	"app-metrics-nozzle/usageevents"
-	"github.com/unrolled/render"
-	"strings"
-	"app-metrics-nozzle/domain"
 	"strconv"
+	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/jtuchscherer/app-metrics-nozzle/domain"
+	"github.com/jtuchscherer/app-metrics-nozzle/usageevents"
+	"github.com/unrolled/render"
 )
 
 func appAllHandler(formatter *render.Render) http.HandlerFunc {
@@ -99,14 +100,13 @@ func appInstanceHandler(formatter *render.Render) http.HandlerFunc {
 
 		instanceIdx, _ := strconv.ParseInt(instanceIndex, 10, 64)
 
-		if 0 <= instanceIdx && instanceIdx < int64(len(stat.Instances))  {
+		if 0 <= instanceIdx && instanceIdx < int64(len(stat.Instances)) {
 			formatter.JSON(w, http.StatusOK, stat.Instances[instanceIdx])
 		} else {
 			formatter.JSON(w, http.StatusNotFound, "No such instance")
 		}
 	}
 }
-
 
 //New deep structure with all application details
 func appHandler(formatter *render.Render) http.HandlerFunc {

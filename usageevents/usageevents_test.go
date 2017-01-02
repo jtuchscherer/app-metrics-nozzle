@@ -1,35 +1,38 @@
 package usageevents_test
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
+
+	"github.com/jtuchscherer/app-metrics-nozzle/usageevents/usageeventsfakes"
+
+	"github.com/jtuchscherer/app-metrics-nozzle/domain"
+	. "github.com/jtuchscherer/app-metrics-nozzle/usageevents"
+
+	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
+	cfclient "github.com/cloudfoundry-community/go-cfclient"
+	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"app-metrics-nozzle/api/apifakes"
-	"app-metrics-nozzle/api"
-	"github.com/cloudfoundry-community/go-cfclient"
-	. "app-metrics-nozzle/usageevents"
-	"app-metrics-nozzle/usageevents/usageeventsfakes"
-	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
-	"github.com/cloudfoundry/sonde-go/events"
-	"app-metrics-nozzle/domain"
-	"io/ioutil"
-	"fmt"
-	"os"
-	"encoding/json"
+	"github.com/jtuchscherer/app-metrics-nozzle/api"
+	"github.com/jtuchscherer/app-metrics-nozzle/api/apifakes"
 )
 
 var _ = Describe("usageevents", func() {
 	var (
-		simpleApp cfclient.App
-		rtrEvent events.Envelope
+		simpleApp    cfclient.App
+		rtrEvent     events.Envelope
 		metricsEvent events.Envelope
-		space cfclient.Space
-		org cfclient.Org
-		allApps        []caching.App
+		space        cfclient.Space
+		org          cfclient.Org
+		allApps      []caching.App
 		appInstances map[string]cfclient.AppInstance
-		fakeClient *apifakes.FakeCFClientCaller
-		fakeCaching *usageeventsfakes.FakeCachedApp
+		fakeClient   *apifakes.FakeCFClientCaller
+		fakeCaching  *usageeventsfakes.FakeCachedApp
 
-		testAppKey string
+		testAppKey   string
 		testAppKeyCC string
 	)
 
@@ -91,11 +94,10 @@ var _ = Describe("usageevents", func() {
 			})
 		})
 
-
 	})
 })
 
-func loadJsonFromFile(filePath string, obj interface{})  {
+func loadJsonFromFile(filePath string, obj interface{}) {
 	file, e := ioutil.ReadFile(filePath)
 	if e != nil {
 		fmt.Printf("File error: %v\n", e)
@@ -103,6 +105,3 @@ func loadJsonFromFile(filePath string, obj interface{})  {
 	}
 	json.Unmarshal(file, obj)
 }
-
-
-

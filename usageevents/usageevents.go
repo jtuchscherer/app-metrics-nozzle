@@ -18,38 +18,40 @@ package usageevents
 
 import (
 	"fmt"
-	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
+	"log"
+	"os"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
+
+	cfclient "github.com/cloudfoundry-community/go-cfclient"
+
+	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/cloudfoundry/sonde-go/events"
-	"strings"
-	"strconv"
-	"app-metrics-nozzle/domain"
-	"os"
-	"log"
-	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/jtuchscherer/app-metrics-nozzle/domain"
 )
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
 type Event struct {
-	Msg            string `json:"message"`
-	Type           string `json:"event_type"`
-	Origin         string `json:"origin"`
-	AppID          string `json:"app_id"`
-	Timestamp      int64  `json:"timestamp"`
-	SourceType     string `json:"source_type"`
-	MessageType    string `json:"message_type"`
-	SourceInstance string `json:"source_instance"`
-	AppName        string `json:"app_name"`
-	OrgName        string `json:"org_name"`
-	SpaceName      string `json:"space_name"`
-	OrgID          string `json:"org_id"`
-	SpaceID        string `json:"space_id"`
-	CellIP         string `json:"cell_ip"`
-	InstanceIndex  int32  `json:"instance_index"`
+	Msg            string  `json:"message"`
+	Type           string  `json:"event_type"`
+	Origin         string  `json:"origin"`
+	AppID          string  `json:"app_id"`
+	Timestamp      int64   `json:"timestamp"`
+	SourceType     string  `json:"source_type"`
+	MessageType    string  `json:"message_type"`
+	SourceInstance string  `json:"source_instance"`
+	AppName        string  `json:"app_name"`
+	OrgName        string  `json:"org_name"`
+	SpaceName      string  `json:"space_name"`
+	OrgID          string  `json:"org_id"`
+	SpaceID        string  `json:"space_id"`
+	CellIP         string  `json:"cell_ip"`
+	InstanceIndex  int32   `json:"instance_index"`
 	CPUPercentage  float64 `json:"cpu_percentage"`
-	MemBytes       uint64 `json:"mem_bytes"`
-	DiskBytes      uint64 `json:"disk_bytes"`
+	MemBytes       uint64  `json:"mem_bytes"`
+	DiskBytes      uint64  `json:"disk_bytes"`
 }
 
 var mutex sync.Mutex
@@ -105,25 +107,23 @@ func ContainerMetric(msg *events.Envelope) Event {
 	message := msg.GetContainerMetric()
 
 	return Event{
-		Origin:         msg.GetOrigin(),
-		Type:           msg.GetEventType().String(),
-		AppID:          message.GetApplicationId(),
-		CellIP:                *msg.Ip,
-		InstanceIndex:  message.GetInstanceIndex(),
-		CPUPercentage:  message.GetCpuPercentage(),
-		MemBytes:       message.GetMemoryBytes(),
-		DiskBytes:      message.GetDiskBytes(),
+		Origin:        msg.GetOrigin(),
+		Type:          msg.GetEventType().String(),
+		AppID:         message.GetApplicationId(),
+		CellIP:        *msg.Ip,
+		InstanceIndex: message.GetInstanceIndex(),
+		CPUPercentage: message.GetCpuPercentage(),
+		MemBytes:      message.GetMemoryBytes(),
+		DiskBytes:     message.GetDiskBytes(),
 	}
 }
-
-
 
 // GetMapKeyFromAppData converts the combo of an app, space, and org into a hashmap key
 func GetMapKeyFromAppData(orgName string, spaceName string, appName string) string {
 	return fmt.Sprintf("%s/%s/%s", orgName, spaceName, appName)
 }
 
-func updateAppWithAppEvent(event Event)  {
+func updateAppWithAppEvent(event Event) {
 	appName := event.AppName
 	appOrg := event.OrgName
 	appSpace := event.SpaceName
@@ -214,7 +214,7 @@ func getAppInfo(appGUID string) caching.App {
 		return app
 	}
 
-	AppDbCache.GetAppByGuid(appGUID)
+	AppDbCache.GetAppByGUID(appGUID)
 
 	return AppDbCache.GetAppInfo(appGUID)
 }
