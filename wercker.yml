@@ -3,7 +3,7 @@ box: golang
 build:
   steps:
     - wercker/setup-go-workspace:
-        package-dir: app-metrics-nozzle
+        package-dir: github.com/jtuchscherer/app-metrics-nozzle
 
     # Gets the dependencies
     - script:
