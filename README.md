@@ -1,3 +1,5 @@
+[![wercker status](https://app.wercker.com/status/7ed48d59016a2c3b71e2c00cf399260b/s/master "wercker status")](https://app.wercker.com/project/byKey/7ed48d59016a2c3b71e2c00cf399260b)
+
 # App Metrics Nozzle
 
 This is a nozzle for the Cloud Foundry firehose component. It will ingest router events for every application it can detect and use the timestamps on those events to compute usage metrics. The first usage for this nozzle will be to determine if an application is unused by tracking the last time a request was routed to it.
