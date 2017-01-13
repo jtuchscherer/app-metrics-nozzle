@@ -1,0 +1,18 @@
+---
+applications:
+- memory: 1024MB
+  instances: 1
+  name: app-metrics-nozzle
+  disk_quota: 1024M
+  command: app-metrics-nozzle
+  buildpack: https://github.com/cloudfoundry/go-buildpack.git
+  env:
+    GOPACKAGENAME: app-metrics-nozzle
+    API_ENDPOINT: https://api.run.pivotal.io
+    DOPPLER_ENDPOINT: wss://doppler.run.pivotal.io:443
+    FIREHOSE_USER: admin
+    FIREHOSE_PASSWORD: admin
+    SKIP_SSL_VALIDATION: false
+    CF_PULL_TIME: 300s
+    USERNAME: admin
+    PASSWORD: admin

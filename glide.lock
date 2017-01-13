@@ -1,5 +1,5 @@
-hash: f74b5ed31285284b91c2b030d384b9c33b6127f0bc4b61dd11926e56621f36e1
-updated: 2017-01-02T17:01:36.59825601+01:00
+hash: b2cb71fcd0560efcaae439d0db823f86b02d80bbe8cd9e55be2a80e6a234d47f
+updated: 2017-01-13T23:34:07.851798696+01:00
 imports:
 - name: github.com/alecthomas/template
   version: b867cc6ab45cece8143cfcc6fc9c77cf3f2c23c0
@@ -32,7 +32,7 @@ imports:
   subpackages:
   - events
 - name: github.com/codegangsta/negroni
-  version: 869b186bb47dc211b46324e11173d59aca4902b8
+  version: 46eece4d3b43dd330e141b20adf0ce9b2b35ba53
 - name: github.com/CrowdSurge/banner
   version: 8c0e79dc5ff70fb2919f0d662f44fd72ccdf9be2
   subpackages:
@@ -62,7 +62,9 @@ imports:
   subpackages:
   - hooks/syslog
 - name: github.com/unrolled/render
-  version: df76b7c9818cdcf458b4c81acbe29d093ff3080f
+  version: 50716a0a853771bb36bfce61a45cdefdb98c2e6e
+- name: github.com/urfave/negroni
+  version: 46eece4d3b43dd330e141b20adf0ce9b2b35ba53
 - name: golang.org/x/net
   version: 7dbad50ab5b31073856416cdcfeb2796d682f844
   subpackages:
@@ -76,7 +78,7 @@ imports:
   subpackages:
   - unix
 - name: google.golang.org/appengine
-  version: 08a149cfaee099e6ce4be01c0113a78c85ee1dee
+  version: 9e2ad0873f358c54296ccdc5116b0652c98226d1
   subpackages:
   - internal
   - internal/base

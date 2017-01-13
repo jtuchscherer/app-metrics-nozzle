@@ -54,9 +54,9 @@ type Event struct {
 	DiskBytes      uint64  `json:"disk_bytes"`
 }
 
-var mutex sync.Mutex
-
 var logger = log.New(os.Stdout, "", 0)
+
+var mutex = &sync.Mutex{}
 
 var AppDetails = make(map[string]domain.App)
 var OrganizationUsers = make(map[string][]cfclient.User)
@@ -124,6 +124,9 @@ func GetMapKeyFromAppData(orgName string, spaceName string, appName string) stri
 }
 
 func updateAppWithAppEvent(event Event) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	appName := event.AppName
 	appOrg := event.OrgName
 	appSpace := event.SpaceName
@@ -144,6 +147,8 @@ func updateAppWithAppEvent(event Event) {
 }
 
 func updateAppWithContainerMetrics(event Event) {
+	mutex.Lock()
+	defer mutex.Unlock()
 
 	appName := event.AppName
 	appOrg := event.OrgName
@@ -152,9 +157,9 @@ func updateAppWithContainerMetrics(event Event) {
 	appKey := GetMapKeyFromAppData(appOrg, appSpace, appName)
 	appDetail := AppDetails[appKey]
 
-	var totalCPU float64 = 0
-	var totalDiskUsage uint64 = 0
-	var totalMemoryUsage uint64 = 0
+	var totalCPU float64
+	var totalDiskUsage uint64
+	var totalMemoryUsage uint64
 
 	if 0 < len(appDetail.Instances) {
 
@@ -179,6 +184,8 @@ func updateAppWithContainerMetrics(event Event) {
 }
 
 func updateAppDetails(event Event) {
+	mutex.Lock()
+	defer mutex.Unlock()
 
 	appName := event.AppName
 	appOrg := event.OrgName
