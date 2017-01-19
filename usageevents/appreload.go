@@ -2,6 +2,7 @@ package usageevents
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/jtuchscherer/app-metrics-nozzle/domain"
@@ -26,6 +27,7 @@ func ReloadApps(cachedApps []caching.App, client apiClient) {
 
 		appDetail := &domain.App{GUID: appId, Name: name}
 		client.AnnotateWithCloudControllerData(appDetail)
+		appDetail.FetchTime = time.Now().String()
 		AppDetails[key] = *appDetail
 		logger.Println(fmt.Sprintf("Registered [%s]", key))
 	}

@@ -172,6 +172,7 @@ func updateAppWithContainerMetrics(event Event) {
 		appDetail.Instances[event.InstanceIndex].CPUUsage = event.CPUPercentage
 		appDetail.Instances[event.InstanceIndex].MemoryUsage = event.MemBytes
 		appDetail.Instances[event.InstanceIndex].DiskUsage = event.DiskBytes
+		appDetail.Instances[event.InstanceIndex].LastEvent = time.Now().String()
 
 		totalCPU = totalCPU + event.CPUPercentage
 		totalDiskUsage = totalDiskUsage + event.DiskBytes

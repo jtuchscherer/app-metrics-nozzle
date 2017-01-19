@@ -15,6 +15,7 @@ type Instance struct {
 	Uptime        int32   `json:"uptime"`
 	Since         int32   `json:"since"`
 	State         string  `json:"state"`
+	LastEvent     string  `json:"last_event"`
 }
 
 type EnvironmentSummary struct {
@@ -49,5 +50,6 @@ type App struct {
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	} `json:"space"`
-	State string `json:"state"`
+	State     string `json:"state"`
+	FetchTime string `json:"fetch_time"`
 }
