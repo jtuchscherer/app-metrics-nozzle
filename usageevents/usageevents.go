@@ -160,7 +160,8 @@ func updateAppWithContainerMetrics(event Event) {
 	var totalCPU float64
 	var totalDiskUsage uint64
 	var totalMemoryUsage uint64
-	if len(appDetail.Instances) < int(event.InstanceIndex) {
+
+	if len(appDetail.Instances) <= int(event.InstanceIndex) {
 		for i := len(appDetail.Instances); i <= int(event.InstanceIndex); i++ {
 			appDetail.Instances = append(appDetail.Instances, domain.Instance{})
 		}
