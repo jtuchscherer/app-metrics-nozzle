@@ -55,6 +55,13 @@ const (
 	version = "0.0.1"
 )
 
+type apiClient interface {
+	OrgsDetailsFromCloudController() []goClient.Org
+	UsersForOrganization(guid string) []goClient.User
+	SpacesDetailsFromCloudController() []goClient.Space
+	UsersForSpace(guid string) []goClient.User
+}
+
 var logger = log.New(os.Stdout, "", 0)
 
 func main() {
@@ -108,11 +115,11 @@ func main() {
 	caching.SetAppDb(db)
 	caching.CreateBucket()
 
-	api.Client = cfClient
+	apiClient := api.NewApiClient(cfClient)
 
 	//Let's Update the database the first time
-	usageevents.ReloadApps(caching.GetAllApp())
-	reloadEnvDetails()
+	usageevents.ReloadApps(caching.GetAllApp(), apiClient)
+	reloadEnvDetails(apiClient)
 	lastReloaded := time.Now()
 	fmt.Println("Reloaded first time:", lastReloaded)
 
@@ -123,8 +130,8 @@ func main() {
 		for range ccPolling.C {
 			now := time.Now()
 			logger.Print(" ---> " + now.Format(time.RFC3339))
-			usageevents.ReloadApps(caching.GetAllApp())
-			reloadEnvDetails()
+			usageevents.ReloadApps(caching.GetAllApp(), apiClient)
+			reloadEnvDetails(apiClient)
 		}
 	}()
 
@@ -147,18 +154,18 @@ func main() {
 	wg.Wait()
 }
 
-func reloadEnvDetails() {
-	usageevents.Orgs = api.OrgsDetailsFromCloudController()
+func reloadEnvDetails(client apiClient) {
+	usageevents.Orgs = client.OrgsDetailsFromCloudController()
 
 	for idx := range usageevents.Orgs {
-		users := api.UsersForOrganization(usageevents.Orgs[idx].Guid)
+		users := client.UsersForOrganization(usageevents.Orgs[idx].Guid)
 		usageevents.OrganizationUsers[usageevents.Orgs[idx].Name] = users
 	}
 
-	usageevents.Spaces = api.SpacesDetailsFromCloudController()
+	usageevents.Spaces = client.SpacesDetailsFromCloudController()
 
 	for idx := range usageevents.Spaces {
-		users := api.UsersForSpace(usageevents.Spaces[idx].Guid)
+		users := client.UsersForSpace(usageevents.Spaces[idx].Guid)
 		usageevents.SpacesUsers[usageevents.Spaces[idx].Name] = users
 	}
 }

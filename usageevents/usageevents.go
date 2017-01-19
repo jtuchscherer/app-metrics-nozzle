@@ -160,19 +160,21 @@ func updateAppWithContainerMetrics(event Event) {
 	var totalCPU float64
 	var totalDiskUsage uint64
 	var totalMemoryUsage uint64
+	if len(appDetail.Instances) < int(event.InstanceIndex) {
+		for i := len(appDetail.Instances); i <= int(event.InstanceIndex); i++ {
+			appDetail.Instances = append(appDetail.Instances, domain.Instance{})
+		}
+	}
 
-	if 0 < len(appDetail.Instances) {
-
+	if len(appDetail.Instances) > 0 {
 		appDetail.Instances[event.InstanceIndex].CellIP = event.CellIP
 		appDetail.Instances[event.InstanceIndex].CPUUsage = event.CPUPercentage
 		appDetail.Instances[event.InstanceIndex].MemoryUsage = event.MemBytes
 		appDetail.Instances[event.InstanceIndex].DiskUsage = event.DiskBytes
 
-		for i := 0; i < len(appDetail.Instances); i++ {
-			totalCPU = totalCPU + event.CPUPercentage
-			totalDiskUsage = totalDiskUsage + event.DiskBytes
-			totalMemoryUsage = totalMemoryUsage + event.MemBytes
-		}
+		totalCPU = totalCPU + event.CPUPercentage
+		totalDiskUsage = totalDiskUsage + event.DiskBytes
+		totalMemoryUsage = totalMemoryUsage + event.MemBytes
 	}
 
 	appDetail.EnvironmentSummary.TotalCPU = totalCPU

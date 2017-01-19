@@ -16,8 +16,6 @@ import (
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/jtuchscherer/app-metrics-nozzle/api"
-	"github.com/jtuchscherer/app-metrics-nozzle/api/apifakes"
 )
 
 var _ = Describe("usageevents", func() {
@@ -28,8 +26,7 @@ var _ = Describe("usageevents", func() {
 		space        cfclient.Space
 		org          cfclient.Org
 		allApps      []caching.App
-		appInstances map[string]cfclient.AppInstance
-		fakeClient   *apifakes.FakeCFClientCaller
+		fakeClient   *usageeventsfakes.FakeApiClient
 		fakeCaching  *usageeventsfakes.FakeCachedApp
 
 		testAppKey   string
@@ -37,6 +34,21 @@ var _ = Describe("usageevents", func() {
 	)
 
 	BeforeEach(func() {
+		fakeClient = &usageeventsfakes.FakeApiClient{}
+		fakeClient.AnnotateWithCloudControllerDataStub = func(app *domain.App) {
+			app.InstanceCount = domain.InstanceCount{
+				Running:    6,
+				Configured: 6,
+			}
+			app.Diego = true
+			app.Routes = []string{"bla.test.com", "bla.test.org", "bla.test.net"}
+			app.Instances = []domain.Instance{domain.Instance{}, domain.Instance{}, domain.Instance{
+				CellIP:      "sdfsdf-sdfsdf",
+				CPUUsage:    0.45,
+				DiskUsage:   5634,
+				MemoryUsage: 10345,
+			}}
+		}
 		testAppKey = "Pivotal/ashumilov/cd-demo-music"
 		testAppKeyCC = "system/system/apps-manager-js"
 		loadJsonFromFile("fixtures/rtr_log_message.json", &rtrEvent)
@@ -45,10 +57,6 @@ var _ = Describe("usageevents", func() {
 		loadJsonFromFile("fixtures/returned_app.json", &simpleApp)
 		loadJsonFromFile("fixtures/app_space.json", &space)
 		loadJsonFromFile("fixtures/space_org.json", &org)
-		fakeClient = new(apifakes.FakeCFClientCaller)
-		fakeClient.AppByGuidReturns(simpleApp, nil)
-		fakeClient.AppSpaceReturns(space, nil)
-		fakeClient.SpaceOrgReturns(org, nil)
 
 		loadJsonFromFile("fixtures/all_cached_apps.json", &allApps)
 		fakeCaching = new(usageeventsfakes.FakeCachedApp)
@@ -59,13 +67,11 @@ var _ = Describe("usageevents", func() {
 	Describe("Given: a Firehouse events", func() {
 		BeforeEach(func() {
 			AppDetails = make(map[string]domain.App)
-			loadJsonFromFile("fixtures/app_instances.json", &appInstances)
-			fakeClient.GetAppInstancesReturns(appInstances, nil)
-			api.Client = fakeClient
+
 			AppDbCache = fakeCaching
 
 			Expect(len(AppDetails)).To(Equal(0))
-			ReloadApps(fakeCaching.GetAllApp())
+			ReloadApps(fakeCaching.GetAllApp(), fakeClient)
 		})
 		Context("When: processed Cloud Controller call", func() {
 			It("then: it should populate the appdetails objects with app info from data returned from CC", func() {
@@ -87,10 +93,10 @@ var _ = Describe("usageevents", func() {
 		Context("When: processed app metrics event", func() {
 			It("then: it should populate the appdetails objects with app info from application metrics event", func() {
 				ProcessEvent(&metricsEvent)
-				Expect(AppDetails[testAppKey].Instances[5].CellIP).ToNot(BeNil())
-				Expect(AppDetails[testAppKey].Instances[5].CPUUsage).ToNot(BeNil())
-				Expect(AppDetails[testAppKey].Instances[5].DiskUsage).ToNot(BeNil())
-				Expect(AppDetails[testAppKey].Instances[5].MemoryUsage).ToNot(BeNil())
+				Expect(AppDetails[testAppKey].Instances[2].CellIP).ToNot(BeNil())
+				Expect(AppDetails[testAppKey].Instances[2].CPUUsage).ToNot(BeNil())
+				Expect(AppDetails[testAppKey].Instances[2].DiskUsage).ToNot(BeNil())
+				Expect(AppDetails[testAppKey].Instances[2].MemoryUsage).ToNot(BeNil())
 			})
 		})
 
