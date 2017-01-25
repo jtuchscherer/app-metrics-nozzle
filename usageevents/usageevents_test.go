@@ -16,6 +16,7 @@ import (
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/orcaman/concurrent-map"
 )
 
 var _ = Describe("usageevents", func() {
@@ -66,37 +67,44 @@ var _ = Describe("usageevents", func() {
 
 	Describe("Given: a Firehouse events", func() {
 		BeforeEach(func() {
-			AppDetails = make(map[string]domain.App)
+			AppDetails = cmap.New()
 
 			AppDbCache = fakeCaching
 
-			Expect(len(AppDetails)).To(Equal(0))
+			Expect(AppDetails.Count()).To(Equal(0))
 			ReloadApps(fakeCaching.GetAllApp(), fakeClient)
 		})
 		Context("When: processed Cloud Controller call", func() {
 			It("then: it should populate the appdetails objects with app info from data returned from CC", func() {
-				Expect(len(AppDetails)).To(BeNumerically(">", 0))
-				Expect(AppDetails[testAppKeyCC].InstanceCount.Configured).To(BeNumerically("==", 6))
-				Expect(AppDetails[testAppKeyCC].InstanceCount.Running).To(BeNumerically("==", 6))
-				Expect(AppDetails[testAppKeyCC].Diego).To(Equal(true))
-				Expect(len(AppDetails[testAppKeyCC].Routes)).To(Equal(3))
+				Expect(AppDetails.Count()).To(BeNumerically(">", 0))
+				cachedAppDetail, _ := AppDetails.Get(testAppKeyCC)
+				appDetail := cachedAppDetail.(domain.App)
+				Expect(appDetail.InstanceCount.Configured).To(BeNumerically("==", 6))
+				Expect(appDetail.InstanceCount.Running).To(BeNumerically("==", 6))
+				Expect(appDetail.Diego).To(Equal(true))
+				Expect(len(appDetail.Routes)).To(Equal(3))
 			})
 		})
 		Context("When: processed RTR event", func() {
 			It("then: it should populate the appdetails objects with app info from event with source type RTR", func() {
 				ProcessEvent(&rtrEvent)
-				Expect(len(AppDetails)).To(BeNumerically(">", 0))
-				Expect(AppDetails[testAppKey].EventCount).To(BeNumerically("==", 1))
-				Expect(AppDetails[testAppKey].LastEventTime).ToNot(BeNil())
+				cachedAppDetail, _ := AppDetails.Get(testAppKey)
+				appDetail := cachedAppDetail.(domain.App)
+
+				Expect(AppDetails.Count()).To(BeNumerically(">", 0))
+				Expect(appDetail.EventCount).To(BeNumerically("==", 1))
+				Expect(appDetail.LastEventTime).ToNot(BeNil())
 			})
 		})
 		Context("When: processed app metrics event", func() {
 			It("then: it should populate the appdetails objects with app info from application metrics event", func() {
 				ProcessEvent(&metricsEvent)
-				Expect(AppDetails[testAppKey].Instances[2].CellIP).ToNot(BeNil())
-				Expect(AppDetails[testAppKey].Instances[2].CPUUsage).ToNot(BeNil())
-				Expect(AppDetails[testAppKey].Instances[2].DiskUsage).ToNot(BeNil())
-				Expect(AppDetails[testAppKey].Instances[2].MemoryUsage).ToNot(BeNil())
+				cachedAppDetail, _ := AppDetails.Get(testAppKey)
+				appDetail := cachedAppDetail.(domain.App)
+				Expect(appDetail.Instances[2].CellIP).ToNot(BeNil())
+				Expect(appDetail.Instances[2].CPUUsage).ToNot(BeNil())
+				Expect(appDetail.Instances[2].DiskUsage).ToNot(BeNil())
+				Expect(appDetail.Instances[2].MemoryUsage).ToNot(BeNil())
 			})
 		})
 

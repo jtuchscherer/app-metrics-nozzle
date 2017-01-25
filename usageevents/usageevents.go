@@ -25,11 +25,11 @@ import (
 	"sync"
 	"time"
 
-	cfclient "github.com/cloudfoundry-community/go-cfclient"
-
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
+	cfclient "github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/jtuchscherer/app-metrics-nozzle/domain"
+	"github.com/orcaman/concurrent-map"
 )
 
 // Event is a struct represented an event augmented/decorated with corresponding app/space/org data.
@@ -58,7 +58,7 @@ var logger = log.New(os.Stdout, "", 0)
 
 var mutex = &sync.Mutex{}
 
-var AppDetails = make(map[string]domain.App)
+var AppDetails = cmap.New() //make(map[string]domain.App)
 var OrganizationUsers = make(map[string][]cfclient.User)
 var SpacesUsers = make(map[string][]cfclient.User)
 var Orgs []cfclient.Org
@@ -132,7 +132,8 @@ func updateAppWithAppEvent(event Event) {
 	appSpace := event.SpaceName
 
 	appKey := GetMapKeyFromAppData(appOrg, appSpace, appName)
-	appDetail := AppDetails[appKey]
+	cachedAppDetail, _ := AppDetails.Get(appKey)
+	appDetail := cachedAppDetail.(domain.App)
 
 	gcStatsMarker := "[GC"
 	if strings.Contains(event.Msg, gcStatsMarker) {
@@ -141,7 +142,7 @@ func updateAppWithAppEvent(event Event) {
 		logger.Println("Setting GC for app " + appKey)
 	}
 
-	AppDetails[appKey] = appDetail
+	AppDetails.Set(appKey, appDetail)
 	//logger.Println("Updated with App event " + appKey)
 
 }
@@ -155,7 +156,8 @@ func updateAppWithContainerMetrics(event Event) {
 	appSpace := event.SpaceName
 
 	appKey := GetMapKeyFromAppData(appOrg, appSpace, appName)
-	appDetail := AppDetails[appKey]
+	cachedAppDetail, _ := AppDetails.Get(appKey)
+	appDetail := cachedAppDetail.(domain.App)
 
 	var totalCPU float64
 	var totalDiskUsage uint64
@@ -183,7 +185,7 @@ func updateAppWithContainerMetrics(event Event) {
 	appDetail.EnvironmentSummary.TotalDiskUsage = totalDiskUsage
 	appDetail.EnvironmentSummary.TotalMemoryUsage = totalMemoryUsage
 
-	AppDetails[appKey] = appDetail
+	AppDetails.Set(appKey, appDetail)
 	//logger.Println("Updated with Container metrics " + appKey)
 }
 
@@ -196,7 +198,8 @@ func updateAppDetails(event Event) {
 	appSpace := event.SpaceName
 
 	appKey := GetMapKeyFromAppData(appOrg, appSpace, appName)
-	appDetail := AppDetails[appKey]
+	cachedAppDetail, _ := AppDetails.Get(appKey)
+	appDetail := cachedAppDetail.(domain.App)
 	appDetail.Organization.Name = appOrg
 	appDetail.Organization.ID = event.OrgID
 	appDetail.Space.Name = appSpace
@@ -213,11 +216,7 @@ func updateAppDetails(event Event) {
 	elapsedSeconds := totalElapsed / 1000000000
 	appDetail.RequestsPerSecond = float64(appDetail.EventCount) / float64(elapsedSeconds)
 	appDetail.ElapsedSinceLastEvent = eventElapsed / 1000000000
-	AppDetails[appKey] = appDetail
-	//spew.Dump(AppDetails[appKey])
-
-	//logger.Println("Updated with App Details " + appKey)
-
+	AppDetails.Set(appKey, appDetail)
 }
 
 func getAppInfo(appGUID string) caching.App {
