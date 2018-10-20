@@ -1,5 +1,3 @@
-[![wercker status](https://app.wercker.com/status/7ed48d59016a2c3b71e2c00cf399260b/s/master "wercker status")](https://app.wercker.com/project/byKey/7ed48d59016a2c3b71e2c00cf399260b)
-
 # App Metrics Nozzle
 
 This is a nozzle for the Cloud Foundry firehose component. It will ingest router events for every application it can detect and use the timestamps on those events to compute usage metrics. The first usage for this nozzle will be to determine if an application is unused by tracking the last time a request was routed to it.
@@ -28,58 +26,69 @@ This application exposes a RESTful API that allows consumers to query applicatio
 This is a sample of what the JSON response looks like for the app `/api/apps`:
 
 ```javascript
-
 {
-  "buildpack": "java-buildpack=v3.6-offline-https://github.com/cloudfoundry/java-buildpack.git#5194155 java-main open-jdk-like-jre=1.8.0_71 open-jdk-like-memory-calculator=2.0.1_RELEASE spring-auto-reconfiguration=1.10.0_RELEASE",
-  "diego": true,
-  "environment": {},
-  "environment_summary": {
-    "total_cpu": 0.19134577882529913,
-    "total_disk_configured": 1073741824,
-    "total_disk_provisioned": 1073741824,
-    "total_disk_usage": 162381824,
-    "total_memory_configured": 1073741824,
-    "total_memory_provisioned": 1073741824,
-    "total_memory_usage": 744574976
+  "johannes-org/development/app-metrics-nozzle": {
+    "buildpack": "https://github.com/cloudfoundry/go-buildpack.git",
+    "diego": true,
+    "environment": {
+      "API_ENDPOINT": "https://api.run.pivotal.io",
+      "CF_PULL_TIME": "300s",
+      "DOPPLER_ENDPOINT": "wss://doppler.run.pivotal.io:443",
+      "FIREHOSE_PASSWORD": "[[PRIVATE]]",
+      "FIREHOSE_USER": "[[PRIVATE]]",
+      "GOPACKAGENAME": "app-metrics-nozzle",
+      "PASSWORD": "[[PRIVATE]]",
+      "SKIP_SSL_VALIDATION": "false",
+      "USERNAME": "[[PRIVATE]]"
+    },
+    "environment_summary": {
+      "total_cpu": 1.2153818869424569,
+      "total_disk_configured": 268435456,
+      "total_disk_provisioned": 268435456,
+      "total_disk_usage": 51855360,
+      "total_memory_configured": 268435456,
+      "total_memory_provisioned": 268435456,
+      "total_memory_usage": 51267356
+    },
+    "guid": "dcfbab8d-46cb-475d-a95b-da2e67ee3312",
+    "instance_count": {
+      "configured": 1,
+      "running": 1
+    },
+    "instances": Array[1][
+      {
+        "cell_ip": "10.10.148.165",
+        "cpu_usage": 1.2153818869424569,
+        "disk_usage": 51855360,
+        "gc_stats": "",
+        "index": 0,
+        "memory_usage": 51267356,
+        "uptime": 45049,
+        "since": 1539962977,
+        "state": "RUNNING",
+        "last_event": "2018-10-20 04:01:24.970336982 +0000 UTC"
+      }
+    ],
+    "name": "app-metrics-nozzle",
+    "organization": {
+      "id": "[[PRIVATE]]",
+      "name": "[[PRIVATE]]"
+    },
+    "event_count": 1,
+    "last_event_time": 1540008031613128991,
+    "requests_per_second": 0.000022214817283127847,
+    "elapsed_since_last_event": 0,
+    "routes": Array[1][
+      "app-metrics-nozzle.cfapps.io"
+    ],
+    "space": {
+      "id": "[[PRIVATE]]5",
+      "name": "[[PRIVATE]]"
+    },
+    "state": "STARTED",
+    "fetch_time": "2018-10-20 04:00:27.673069672 +0000 UTC"
   },
-  "guid": "bb7b3c89-0a7f-47f7-9dd3-5e4fbd8ded6c",
-  "instance_count": {
-    "configured": 1,
-    "running": 1
-  },
-  "instances": [
-    {
-      "cell_ip": "10.65.201.46",
-      "cpu_usage": 0.19134577882529913,
-      "disk_usage": 162381824,
-      "gc_stats": "",
-      "index": 0,
-      "memory_usage": 744574976,
-      "uptime": 16876,
-      "since": 1465999843,
-      "state": "RUNNING"
-    }
-  ],
-  "name": "cd-demo-music",
-  "organization": {
-    "id": "c661e8c6-649a-4fe0-b471-afe5982e4e53",
-    "name": "Pivotal"
-  },
-  "event_count": 55,
-  "last_event_time": 1466016785654174635,
-  "requests_per_second": 0.025380710659898477,
-  "elapsed_since_last_event": 0,
-  "routes": [
-    "ashumilov.cfapps.haas-41.pez.pivotal.io"
-  ],
-  "space": {
-    "id": "dc4d1d1f-f4b9-4c60-8cbb-5763491d00c1",
-    "name": "ashumilov"
-  },
-  "state": "STARTED"
-}
-,
-"org/space/app" : {},
+  [...]
 ```
 
 If the `last_event_time` field is `0` that indicates that no _router_ events for that application have been discovered _since the nozzle was started_.
