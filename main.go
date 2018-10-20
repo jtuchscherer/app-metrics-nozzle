@@ -35,9 +35,9 @@ import (
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	"github.com/cloudfoundry/noaa/consumer"
 	"github.com/cloudfoundry/sonde-go/events"
-	"github.com/jtuchscherer/app-metrics-nozzle/api"
-	"github.com/jtuchscherer/app-metrics-nozzle/service"
-	"github.com/jtuchscherer/app-metrics-nozzle/usageevents"
+	"github.com/pivotalservices/app-metrics-nozzle/api"
+	"github.com/pivotalservices/app-metrics-nozzle/service"
+	"github.com/pivotalservices/app-metrics-nozzle/usageevents"
 )
 
 var (

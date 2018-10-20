@@ -21,7 +21,7 @@ import (
 	cfclient "github.com/cloudfoundry-community/go-cfclient"
 
 	"github.com/gorilla/mux"
-	"github.com/jtuchscherer/app-metrics-nozzle/usageevents"
+	"github.com/pivotalservices/app-metrics-nozzle/usageevents"
 	"github.com/unrolled/render"
 )
 

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
-	"github.com/jtuchscherer/app-metrics-nozzle/domain"
+	"github.com/pivotalservices/app-metrics-nozzle/domain"
 )
 
 type apiClient interface {

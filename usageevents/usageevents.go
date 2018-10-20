@@ -28,7 +28,7 @@ import (
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
 	cfclient "github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry/sonde-go/events"
-	"github.com/jtuchscherer/app-metrics-nozzle/domain"
+	"github.com/pivotalservices/app-metrics-nozzle/domain"
 	"github.com/orcaman/concurrent-map"
 )
 

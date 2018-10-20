@@ -1,4 +1,4 @@
-package: github.com/jtuchscherer/app-metrics-nozzle
+package: github.com/pivotalservices/app-metrics-nozzle
 import:
 - package: github.com/CrowdSurge/banner
 - package: github.com/boltdb/bolt

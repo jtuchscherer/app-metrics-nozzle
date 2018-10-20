@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	cfclient "github.com/cloudfoundry-community/go-cfclient"
-	"github.com/jtuchscherer/app-metrics-nozzle/domain"
+	"github.com/pivotalservices/app-metrics-nozzle/domain"
 )
 
 type apiClient struct {

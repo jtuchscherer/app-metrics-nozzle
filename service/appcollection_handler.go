@@ -23,8 +23,8 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/jtuchscherer/app-metrics-nozzle/domain"
-	"github.com/jtuchscherer/app-metrics-nozzle/usageevents"
+	"github.com/pivotalservices/app-metrics-nozzle/domain"
+	"github.com/pivotalservices/app-metrics-nozzle/usageevents"
 	"github.com/unrolled/render"
 )
 

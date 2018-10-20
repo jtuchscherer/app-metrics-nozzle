@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/cloudfoundry-community/firehose-to-syslog/caching"
-	"github.com/jtuchscherer/app-metrics-nozzle/usageevents"
+	"github.com/pivotalservices/app-metrics-nozzle/usageevents"
 )
 
 type FakeCachedApp struct {

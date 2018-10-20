@@ -4,7 +4,7 @@ package usageeventsfakes
 import (
 	"sync"
 
-	"github.com/jtuchscherer/app-metrics-nozzle/domain"
+	"github.com/pivotalservices/app-metrics-nozzle/domain"
 )
 
 type FakeApiClient struct {

@@ -19,7 +19,7 @@ package service
 import (
 	"net/http"
 
-	"github.com/jtuchscherer/app-metrics-nozzle/usageevents"
+	"github.com/pivotalservices/app-metrics-nozzle/usageevents"
 	"github.com/unrolled/render"
 
 	"strings"
